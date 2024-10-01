@@ -14,12 +14,12 @@ poetry install
 
 ### Ollama
 
-This demo uses `Llama 3` via Ollama by default.
+This demo uses `Llama 3.2` via Ollama by default.
 
 Download and install [Ollama](https://ollama.com/), and run
 
 ```bash
-ollama pull llama3
+ollama pull llama3.2
 ollama serve
 ```
 

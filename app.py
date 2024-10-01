@@ -6,7 +6,7 @@ import operator
 from langchain_core.messages import AnyMessage, HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, AIMessagePromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Annotated, Sequence
 
@@ -21,7 +21,7 @@ async def chat_node(state: ChatState, config: RunnableConfig) -> ChatState:
             content="You're a careful thinker. Think step by step before answering."),
         MessagesPlaceholder(variable_name="messages"),
     ])
-    llm = ChatOllama(name="chat_llama3", model="llama3", stop=[
+    llm = ChatOllama(name="chat_llama3.2", model="llama3.2", stop=[
         "<|start_header_id|>",
         "<|end_header_id|>",
         "<|eot_id|>",
@@ -63,7 +63,8 @@ async def on_message(message: cl.Message):
     ui_message = cl.Message(content="")
     await ui_message.send()
     async for event in graph.astream_events(state, version="v1"):
-        if event["event"] == "on_chat_model_stream" and event["name"] == "chat_llama3":
+        print(f"event: {event}")
+        if event["event"] == "on_chat_model_stream" and event["name"] == "chat_llama3.2":
             content = event["data"]["chunk"].content or ""
             await ui_message.stream_token(token=content)
     await ui_message.update()

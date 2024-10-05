@@ -55,6 +55,6 @@ This will start the demo on **port 8000**, providing a user interface to interac
 - **Text Processing**: Leverage Llama's advanced natural language understanding for tasks like summarization, translation, or Q&A.
 
 ## **Additional Resources**
-- [Chainlit Documentation](https://chainlit.io/docs)
-- [Langgraph Documentation](https://langgraph.com/docs)
-- [Ollama Llama 3.2 Model Info](https://ollama.com/models/llama)
+- [Chainlit Documentation](https://docs.chainlit.io/get-started/overview)
+- [Langgraph Documentation](https://langchain-ai.github.io/langgraph/)
+- [Ollama Llama 3.2 Model Info](https://ollama.com/library/llama3.2)

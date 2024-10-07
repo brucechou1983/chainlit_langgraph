@@ -5,6 +5,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from langchain_ollama.chat_models import ChatOllama
 from langgraph.graph import StateGraph, END
+from ..llm import create_chat_model
 
 
 class ChatState(TypedDict):
@@ -17,12 +18,7 @@ async def chat_node(state: ChatState, config: RunnableConfig) -> ChatState:
             content="You're a careful thinker. Think step by step before answering."),
         MessagesPlaceholder(variable_name="messages"),
     ])
-    llm = ChatOllama(name="chat_llama3.2", model="llama3.2", stop=[
-        "<|start_header_id|>",
-        "<|end_header_id|>",
-        "<|eot_id|>",
-        "<|reserved_special_token"
-    ])
+    llm = create_chat_model("chat_llama3.2", model="ollama-llama3.2")
     chain: Runnable = prompt | llm
     response = await chain.ainvoke(state, config=config)
     return {

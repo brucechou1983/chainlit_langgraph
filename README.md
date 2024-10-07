@@ -64,6 +64,8 @@ export ANTHROPIC_API_KEY=your_api_key_here
 export OPENAI_API_KEY=your_api_key_here
 
 
+Please note that you can select the LLM for the chatbot in the settings menu next to the text field in the demo.
+
 ### **Step 3: Running the Demo**
 After completing the above steps, run the Chainlit demo using the following command:
 

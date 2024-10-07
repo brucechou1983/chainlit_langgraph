@@ -3,6 +3,7 @@ Simple demo of integration with ChainLit and LangGraph.
 """
 import chainlit as cl
 from chat_workflow.graphs.base import create_graph, create_default_chat_state, ChatState
+from chat_workflow.settings import get_chat_settings
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
 
@@ -18,6 +19,9 @@ async def on_chat_start():
     # save graph and state to the user session
     cl.user_session.set("graph", graph.compile())
     cl.user_session.set("state", state)
+
+    # Chat Settings
+    await update_state_by_settings(await get_chat_settings())
 
 
 @cl.on_message
@@ -44,3 +48,10 @@ async def on_message(message: cl.Message):
     # Update State
     state["messages"] += [AIMessage(content=total_content)]
     cl.user_session.set("state", state)
+
+
+@cl.on_settings_update
+async def update_state_by_settings(settings: cl.ChatSettings):
+    state = cl.user_session.get("state")
+    for key in settings.keys():
+        state[key] = settings[key]

@@ -12,6 +12,13 @@ This repository provides a demo showcasing the integration between Chainlit and 
 - **Langgraph**: Enables structured data integration and interaction.
 - **Llama 3.2** via **Ollama**: Ensures high-performance language modeling for your project.
 - Easy-to-follow setup with **Poetry** for dependency management.
+
+## Upcoming Features
+- **LLM module**: Easy-to-use interface for switching between LLMs from different providers.
+- **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
+- **Image Input**: User can upload images and interact with them.
+- **Image Generation**: Generate images based on user input.
+- **OpenAI o1-like agents**: Advanced self-prompting agents.
   
 ## **Installation Guide**
 Follow these steps to set up and run the project in your Python 3.10 virtual environment.

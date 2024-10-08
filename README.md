@@ -1,7 +1,7 @@
 # **Chainlit Langgraph Integration**  
 An integration of Chainlit with Langgraph, leveraging state-of-the-art LLMs including **Llama 3.2** via **Ollama**, **Claude 3.5 Sonnet**, and **GPT-4o** for advanced language processing and interaction.
 
-![Demo](./public/screenshot.png)
+![Demo](./public/screenshot.gif)
 
 ## **Overview**
 This repository provides a demo showcasing the integration between Chainlit and Langgraph, designed to facilitate seamless communication between systems using state-of-the-art language models. Whether you're working with conversational AI or need a robust language model for text-based tasks, this project helps streamline the process with support for multiple LLMs.

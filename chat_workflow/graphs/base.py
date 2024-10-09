@@ -43,7 +43,7 @@ async def datetime_node(state: ChatState, config: RunnableConfig) -> ChatState:
 
 async def tool_selection_node(state: ChatState, config: RunnableConfig) -> ChatState:
     system_promopt = """
-Your role is to select the most appropriate tools to use based on the user's input.
+Your role is to select the most appropriate tools to use based on the user's latest input.
 
 The available tools are:
 {available_tools}
@@ -52,9 +52,9 @@ Your output should be a comma separated list of tool names like this:
 
 name_of_tool_1,name_of_tool_2
 
-When the user's input needs no tool to answer, you should return an empty str.
+When the user's input needs no tool to answer, just return the word "none".
 
-Note that only use the tools that are listed above.
+Note that only use the tools that are listed above, and only use the tools if necessary.
 
 It's important that don't output any other information before or after the list.
 """

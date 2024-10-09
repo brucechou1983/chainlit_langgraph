@@ -3,7 +3,7 @@ from chainlit.input_widget import Select
 
 chat_models = ["ollama-llama3.2", "claude-3-5-sonnet-20240620", "gpt-4o"]
 tool_selection_models = ["ollama-llama3.2",
-                         "claude-3-haiku-20240307", "gpt-4o-mini"]
+                         "claude-3-5-sonnet-20240620", "gpt-4o-mini"]
 
 
 async def get_chat_settings() -> cl.ChatSettings:

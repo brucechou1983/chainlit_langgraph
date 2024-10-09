@@ -38,7 +38,7 @@ async def on_message(message: cl.Message):
     await ui_message.send()
     total_content: str = ""
     async for event in graph.astream_events(state, version="v1"):
-        print(f"event: {event}")
+        # print(f"event: {event}")
         if event["event"] == "on_chat_model_stream" and event["name"] == "chat_model":
             content = event["data"]["chunk"].content or ""
             total_content += content

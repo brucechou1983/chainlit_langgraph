@@ -34,15 +34,18 @@ async def on_message(message: cl.Message):
     state["messages"] += [HumanMessage(content=message.content)]
 
     # Stream the response to the UI
-    ui_message = cl.Message(content="")
-    await ui_message.send()
+    ui_message = None
     total_content: str = ""
     async for event in graph.astream_events(state, version="v1"):
         # print(f"event: {event}")
         if event["event"] == "on_chat_model_stream" and event["name"] == "chat_model":
             content = event["data"]["chunk"].content or ""
             total_content += content
-            await ui_message.stream_token(token=content)
+            if ui_message is None:
+                ui_message = cl.Message(content=content)
+                await ui_message.send()
+            else:
+                await ui_message.stream_token(token=content)
     await ui_message.update()
 
     # Update State

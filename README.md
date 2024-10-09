@@ -8,11 +8,11 @@ This repository provides a demo showcasing the integration between Chainlit and 
 
 ## **Features**
 - **Chainlit**: A powerful tool for creating interactive interfaces for AI models.
-- **Langgraph**: Enables structured data integration and interaction.
+- **LangGraph**: Enables the creation of complex language agentic workflows.
 - **Multiple LLM Support**: 
   - **Llama 3.2** via **Ollama**: High-performance open-source language model.
   - **Claude 3.5 Sonnet**: Advanced AI model by Anthropic.
-  - **GPT-4**: State-of-the-art language model by OpenAI.
+  - **GPT-4o**: State-of-the-art language model by OpenAI.
 - **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
 - **Search Engine**: Search for information from the web.
 - Easy-to-follow setup with **Poetry** for dependency management.
@@ -20,7 +20,7 @@ This repository provides a demo showcasing the integration between Chainlit and 
 ## Upcoming Features
 - **Image Input**: User can upload images and interact with them.
 - **Image Generation**: Generate images based on user input.
-- **OpenAI o1-like agents**: Advanced self-prompting agents.
+- **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
   
 ## **Installation Guide**
 Follow these steps to set up and run the project in your Python 3.10 virtual environment.

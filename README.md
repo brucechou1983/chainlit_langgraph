@@ -1,5 +1,5 @@
 # **Chainlit Langgraph Integration**  
-An integration of Chainlit with Langgraph, leveraging state-of-the-art LLMs including **Llama 3.2** via **Ollama**, **Claude 3.5 Sonnet**, and **GPT-4o** for advanced language processing and interaction.
+Build your AI agent chatbot applications with this powerful integration of **Chainlit** and **LangGraph**.
 
 ![Demo](./public/screenshot.gif)
 
@@ -13,10 +13,10 @@ This repository provides a demo showcasing the integration between Chainlit and 
   - **Llama 3.2** via **Ollama**: High-performance open-source language model.
   - **Claude 3.5 Sonnet**: Advanced AI model by Anthropic.
   - **GPT-4**: State-of-the-art language model by OpenAI.
+- **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
 - Easy-to-follow setup with **Poetry** for dependency management.
 
 ## Upcoming Features
-- **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
 - **Image Input**: User can upload images and interact with them.
 - **Image Generation**: Generate images based on user input.
 - **OpenAI o1-like agents**: Advanced self-prompting agents.

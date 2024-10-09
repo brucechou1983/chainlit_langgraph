@@ -14,6 +14,7 @@ This repository provides a demo showcasing the integration between Chainlit and 
   - **Claude 3.5 Sonnet**: Advanced AI model by Anthropic.
   - **GPT-4**: State-of-the-art language model by OpenAI.
 - **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
+- **Search Engine**: Search for information from the web.
 - Easy-to-follow setup with **Poetry** for dependency management.
 
 ## Upcoming Features
@@ -34,7 +35,17 @@ poetry install
 ```
 
 ### **Step 2: Setting Up LLMs**
-This demo supports multiple LLMs. Setup the appropriate environment variables.
+This demo supports multiple LLMs. Setup the appropriate environment variables in the `.env` file. See the `.env.example` file for reference.
+
+```
+# LLM API
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
+
+# Search Engine
+TAVILY_API_KEY=
+BRAVE_SEARCH_API_KEY=
+```
 
 #### Ollama (for Llama 3.2):
 1. Download and install [Ollama](https://ollama.com/download).

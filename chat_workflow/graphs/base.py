@@ -44,6 +44,7 @@ async def datetime_node(state: ChatState, config: RunnableConfig) -> ChatState:
 
 
 async def tool_selection_node(state: ChatState, config: RunnableConfig) -> ChatState:
+    # TODO: better prompt to reason first, output the plan then finally output the tool names
     system_promopt = """
 Your role is to select the most appropriate tools to use based on the user's latest input.
 

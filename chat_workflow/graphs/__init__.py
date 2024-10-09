@@ -11,5 +11,11 @@ class ChatState(TypedDict):
     # Model name of the chatbot
     chat_model: str
 
+    # Model name of the tool selection model
+    tool_selection_model: str
+
     # Tool messages which will be appended to the messages
     tool_results: Sequence[Dict[str, str]]
+
+    # Tool names to call
+    tools_to_call: Sequence[str]

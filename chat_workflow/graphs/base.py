@@ -33,11 +33,11 @@ async def chat_node(state: ChatState, config: RunnableConfig) -> ChatState:
     # Append search results to the message history
     if len(state["tool_results"]) > 0:
         last_msg = state["messages"][-1].content + "\n" + \
-            "\n".join(result for result in state["tool_results"])
+            "\n".join(
+                f"{result['name']}: \n{result['value']}" for result in state["tool_results"])
         history = state["messages"][:-1] + [HumanMessage(content=last_msg)]
     else:
         history = state["messages"]
-
     response = await chain.ainvoke({"history": history}, config=config)
     return {
         "tool_results": [],

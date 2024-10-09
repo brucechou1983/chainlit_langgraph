@@ -22,8 +22,7 @@ async def search_node(state: ChatState, config: RunnableConfig) -> ChatState:
     )
     try:
         pages = [doc.page_content for doc in search_engine.lazy_load()]
-        result = "\nsearch results:\n" + \
-            "\n".join([f" - {page}" for page in pages])
-        return {"tool_results": state["tool_results"] + [result]}
+        result = "\n".join([f" - {page}" for page in pages])
+        return {"tool_results": state["tool_results"] + [{"name": "search result pages", "value": result}]}
     except Exception as e:
         return {}

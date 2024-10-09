@@ -1,5 +1,5 @@
 import operator
-from typing import TypedDict, Annotated, Sequence
+from typing import TypedDict, Annotated, Sequence, Dict
 from langchain_core.messages import AnyMessage
 
 
@@ -12,4 +12,4 @@ class ChatState(TypedDict):
     chat_model: str
 
     # Tool messages which will be appended to the messages
-    tool_results: Sequence[str]
+    tool_results: Sequence[Dict[str, str]]

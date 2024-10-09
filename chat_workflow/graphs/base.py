@@ -11,10 +11,11 @@ from langgraph.graph import StateGraph, END
 from . import ChatState
 from ..llm import create_chat_model
 # TODO: make it more flexible to add new tools
-from ..tools.search.brave import search_node
+from ..tools.search import search_node
 
 load_dotenv()
 
+# TODO: refactor
 available_tools = [
     {"name": "search", "description": "Search the web. Usually used to answer questions that require real-time information. Or when the user asks for searching directly."},
     {"name": "datetime", "description": "Get the current date and time"},
@@ -28,6 +29,7 @@ def create_default_chat_state():
         "chat_model": os.getenv("CHAT_MODEL", "ollama-llama3.2"),
         "tool_results": [],
         "tools_to_call": [],
+        "search_engine": None,
     }
 
 

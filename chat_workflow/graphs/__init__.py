@@ -1,5 +1,5 @@
 import operator
-from typing import TypedDict, Annotated, Sequence, Dict
+from typing import TypedDict, Annotated, Sequence, Dict, Optional
 from langchain_core.messages import AnyMessage
 
 
@@ -19,3 +19,6 @@ class ChatState(TypedDict):
 
     # Tool names to call
     tools_to_call: Sequence[str]
+
+    # Search Engine
+    search_engine: Optional[str]

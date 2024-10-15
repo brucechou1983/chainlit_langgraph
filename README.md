@@ -87,6 +87,10 @@ chainlit run app.py --port 8000
 
 This will start the demo on **port 8000**, providing a user interface to interact with the Langgraph integration powered by your chosen LLM.
 
+## **Creating Your Own Workflow**
+- Inherit from the `BaseWorkflow` and `BaseState` classes. For more details, refer to the [Simple Chat Workflow](./chat_workflow/workflows/simple_chat.py) example.
+- Place your workflow in the `chat_workflow/workflows` module.
+
 ## **Usage Examples**
 - **Conversational AI**: Utilize Chainlit to create conversational interfaces that can be integrated into websites or apps.
 - **Text Processing**: Leverage advanced natural language understanding for tasks like summarization, translation, or Q&A.

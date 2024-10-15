@@ -7,7 +7,7 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 
 async def search(query: str) -> str:
     """
-    Search the web for the given query
+    Search the web to fact checking, getting latest or real-time information.
 
     Args:
         query: The query to search for

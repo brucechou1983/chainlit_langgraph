@@ -43,7 +43,6 @@ class SimpleChatWorkflow(BaseWorkflow):
         ])
         llm = create_chat_model(
             "chat_model", model=state["chat_model"], tools=self.tools)
-        print(f"llm: {llm}")
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke(state, config=config)]

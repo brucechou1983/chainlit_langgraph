@@ -82,21 +82,3 @@ async def on_message(message: cl.Message):
     # Update State
     state["messages"] += [AIMessage(content=total_content)]
     cl.user_session.set("state", state)
-
-
-@cl.on_settings_update
-async def update_state_by_settings(settings: cl.ChatSettings):
-    state = cl.user_session.get("state")
-    current_module = cl.user_session.get("current_module")
-
-    if "module" in settings and settings["module"] != current_module:
-        create_graph, create_default_state = discovered_modules[settings["module"]]
-        graph = create_graph()
-        state = create_default_state()
-        cl.user_session.set("graph", graph.compile())
-        cl.user_session.set("current_module", settings["module"])
-
-    for key in settings.keys():
-        state[key] = settings[key]
-
-    cl.user_session.set("state", state)

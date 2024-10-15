@@ -3,6 +3,7 @@ Simple demo of integration with ChainLit and LangGraph.
 """
 import chainlit as cl
 from chat_workflow.graphs.base import create_graph, create_default_chat_state, ChatState
+from chat_workflow.graphs.resume import resume_graph, create_default_resume_state, ResumeState
 from chat_workflow.settings import get_chat_settings
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable

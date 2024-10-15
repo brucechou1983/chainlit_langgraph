@@ -1,7 +1,7 @@
 from datetime import datetime
 
 
-def get_datetime_now() -> str:
+async def get_datetime_now() -> str:
     """
     Get current datetime.
     """

@@ -40,7 +40,7 @@ async def get_chat_settings(workflows: List) -> cl.ChatSettings:
             id="chat_model",
             label="Chat Model",
             values=chat_models,
-            initial_index=0,
+            initial_index=1,
         ),
     ]
     # if len(available_search_engines) > 0:

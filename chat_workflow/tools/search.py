@@ -5,7 +5,7 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 # load_dotenv()
 
 
-def search(query: str) -> str:
+async def search(query: str) -> str:
     """
     Search the web for the given query
 
@@ -13,6 +13,6 @@ def search(query: str) -> str:
         query: The query to search for
     """
     search_engine = TavilySearchResults(max_results=5)
-    pages = search_engine.invoke(query)
+    pages = await search_engine.ainvoke(query)
     result = "\n".join([f" - {page['content']}" for page in pages])
     return result

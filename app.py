@@ -12,7 +12,6 @@ discovered_workflows = discover_modules()
 
 @cl.on_chat_start
 async def on_chat_start():
-    print(f"Discovered workflows: {discovered_workflows}")
     workflow_name = "simple_chat"  # Default workflow
     workflow = discovered_workflows[workflow_name]
 

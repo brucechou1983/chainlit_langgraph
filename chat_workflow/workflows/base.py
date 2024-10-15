@@ -20,10 +20,12 @@ class BaseWorkflow(ABC):
     def name(self) -> str:
         pass
 
+    @property
+    @abstractmethod
+    def output_chat_model(self) -> str:
+        pass
 
-class ChatState(TypedDict):
+
+class BaseState(TypedDict):
     # Message history
     messages: Annotated[Sequence[AnyMessage], operator.add]
-
-    # Model name of the chatbot
-    chat_model: str

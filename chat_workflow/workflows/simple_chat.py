@@ -3,29 +3,26 @@ from langgraph.graph import StateGraph, END
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
-from .base import BaseWorkflow, ChatState
+from .base import BaseWorkflow, BaseState
 from ..llm import create_chat_model
 from ..tools import BasicToolNode
 from ..tools.search import search
 from ..tools.time import get_datetime_now
 
 
-class GraphState(ChatState):
-    name: str
+class GraphState(BaseState):
+    # Model name of the chatbot
+    chat_model: str
 
 
 class SimpleChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
+
+        # TODO: check tool availability
         self.tools = [get_datetime_now, search]
 
-    # def enrich_tools(self):
-    #     # TODO: check if tools are valid
-    #     self.tools.append(search)
-
     def create_graph(self) -> StateGraph:
-        # self.enrich_tools()
-
         graph = StateGraph(GraphState)
         graph.add_node("chat", self.chat_node)
         graph.add_node("tools", BasicToolNode(self.tools))
@@ -42,7 +39,7 @@ class SimpleChatWorkflow(BaseWorkflow):
             MessagesPlaceholder(variable_name="messages"),
         ])
         llm = create_chat_model(
-            "chat_model", model=state["chat_model"], tools=self.tools)
+            self.output_chat_model, model=state["chat_model"], tools=self.tools)
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke(state, config=config)]
@@ -74,3 +71,7 @@ class SimpleChatWorkflow(BaseWorkflow):
     @property
     def name(self) -> str:
         return "simple_chat"
+
+    @property
+    def output_chat_model(self) -> str:
+        return "chat_model"

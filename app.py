@@ -51,6 +51,7 @@ async def on_message(message: cl.Message):
     # Retrieve the graph and state from the user session
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
+    workflow = discovered_workflows[cl.user_session.get("current_workflow")]
 
     # Append the new message to the state
     state["messages"] += [HumanMessage(content=message.content)]
@@ -60,7 +61,7 @@ async def on_message(message: cl.Message):
     total_content: str = ""
     async for event in graph.astream_events(state, version="v1"):
         string_content = ""
-        if event["event"] == "on_chat_model_stream" and event["name"] == "chat_model":
+        if event["event"] == "on_chat_model_stream" and event["name"] == workflow.output_chat_model:
             content = event["data"]["chunk"].content or ""
             if type(content) == str:
                 string_content += content

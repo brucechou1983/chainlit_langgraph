@@ -3,7 +3,6 @@ from typing import TypedDict, Annotated, Sequence, Dict, Optional
 from langchain_core.messages import AnyMessage
 
 
-# TODO: a middleware to patch the state definition based on the tool used
 class ChatState(TypedDict):
     # Message history
     messages: Annotated[Sequence[AnyMessage], operator.add]
@@ -11,6 +10,8 @@ class ChatState(TypedDict):
     # Model name of the chatbot
     chat_model: str
 
+
+class ToolChatState(ChatState):
     # Model name of the tool selection model
     tool_selection_model: str
 
@@ -20,5 +21,7 @@ class ChatState(TypedDict):
     # Tool names to call
     tools_to_call: Sequence[str]
 
+
+class SearchChatState(ToolChatState):
     # Search Engine
     search_engine: Optional[str]

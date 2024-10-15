@@ -4,13 +4,13 @@ from dotenv import load_dotenv
 from langchain_core.runnables import RunnableConfig
 from langchain_community.document_loaders import BraveSearchLoader
 from langchain_community.tools.tavily_search import TavilySearchResults
-from ..graphs import ChatState
+from ..graphs import SearchChatState
 
 load_dotenv()
 
 
 @cl.step(name="Search", type="tool")
-async def search_node(state: ChatState, config: RunnableConfig) -> ChatState:
+async def search_node(state: SearchChatState, config: RunnableConfig) -> SearchChatState:
     # TODO: refactor the available tools list and remove this check
     if state["search_engine"] is None:
         return {

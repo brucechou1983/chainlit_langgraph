@@ -8,7 +8,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, Syst
 from langchain_core.runnables import Runnable, RunnableConfig
 from langchain_core.output_parsers import StrOutputParser, CommaSeparatedListOutputParser
 from langgraph.graph import StateGraph, END
-from . import ChatState
+from . import SearchChatState as GraphState
 from ..llm import create_chat_model
 # TODO: make it more flexible to add new tools
 from ..tools.search import search_node
@@ -23,7 +23,7 @@ available_tools = [
 ]
 
 
-def create_default_chat_state():
+def create_default_state():
     return {
         "messages": [],
         "chat_model": os.getenv("CHAT_MODEL", "ollama-llama3.2"),
@@ -33,7 +33,7 @@ def create_default_chat_state():
     }
 
 
-async def datetime_node(state: ChatState, config: RunnableConfig) -> ChatState:
+async def datetime_node(state: GraphState, config: RunnableConfig) -> GraphState:
     async with cl.Step("Datetime") as step:
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         step.output = now
@@ -43,7 +43,7 @@ async def datetime_node(state: ChatState, config: RunnableConfig) -> ChatState:
         }
 
 
-async def tool_selection_node(state: ChatState, config: RunnableConfig) -> ChatState:
+async def tool_selection_node(state: GraphState, config: RunnableConfig) -> GraphState:
     # TODO: better prompt to reason first, output the plan then finally output the tool names
     system_promopt = """
 Your role is to select the most appropriate tools to use based on the user's latest input.
@@ -81,7 +81,7 @@ It's important that don't output any other information before or after the list.
     }
 
 
-async def chat_node(state: ChatState, config: RunnableConfig) -> ChatState:
+async def chat_node(state: GraphState, config: RunnableConfig) -> GraphState:
     prompt = ChatPromptTemplate.from_messages([
         SystemMessage(content="You're a helpful assistant."),
         MessagesPlaceholder(variable_name="history"),
@@ -104,7 +104,7 @@ async def chat_node(state: ChatState, config: RunnableConfig) -> ChatState:
     }
 
 
-def tool_routing(state: ChatState) -> str:
+def tool_routing(state: GraphState) -> str:
     print(f"tools_to_call: {state['tools_to_call']}")
     if len(state["tools_to_call"]) == 0:
         return "chat"
@@ -117,7 +117,7 @@ def tool_routing(state: ChatState) -> str:
 
 
 def create_graph():
-    graph = StateGraph(ChatState)
+    graph = StateGraph(GraphState)
     graph.add_node("tool_selection", tool_selection_node)
     graph.add_node("search", search_node)
     graph.add_node("datetime", datetime_node)

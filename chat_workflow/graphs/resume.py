@@ -3,7 +3,7 @@ from langchain_core.messages import AnyMessage
 import operator
 
 
-class ResumeState(TypedDict):
+class GraphState(TypedDict):
     # Message history
     messages: Annotated[Sequence[AnyMessage], operator.add]
 
@@ -13,7 +13,7 @@ class ResumeState(TypedDict):
     match_result: Optional[str]
 
 
-def create_default_resume_state():
+def create_default_state():
     return {
         "messages": [],
         "resume_content": None,
@@ -22,7 +22,7 @@ def create_default_resume_state():
     }
 
 
-def resume_graph():
+def create_graph():
     # Implement the resume processing graph here
     # This function should return a StateGraph object
     # that defines the workflow for resume analysis

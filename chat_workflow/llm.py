@@ -1,9 +1,15 @@
+import os
 import re
+import requests
+from dotenv import load_dotenv
+from openai import OpenAI
 from typing import Optional, List
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_anthropic import ChatAnthropic
 from langchain_ollama import ChatOllama
 from langchain_openai import ChatOpenAI
+
+load_dotenv()
 
 
 def _create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
@@ -39,3 +45,110 @@ def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwa
         return llm
     else:
         return llm.bind_tools(tools)
+
+
+# List all available Ollama models by hitting the api endpoint
+# api endpoint: curl http://localhost:11434/api/tags
+# api response sample:
+# {
+#   "models": [
+#     {
+#       "name": "codellama:13b",
+#       "modified_at": "2023-11-04T14:56:49.277302595-07:00",
+#       "size": 7365960935,
+#       "digest": "9f438cb9cd581fc025612d27f7c1a6669ff83a8bb0ed86c94fcf4c5440555697",
+#       "details": {
+#         "format": "gguf",
+#         "family": "llama",
+#         "families": null,
+#         "parameter_size": "13B",
+#         "quantization_level": "Q4_0"
+#       }
+#     },
+#     {
+#       "name": "llama3:latest",
+#       "modified_at": "2023-12-07T09:32:18.757212583-08:00",
+#       "size": 3825819519,
+#       "digest": "fe938a131f40e6f6d40083c9f0f430a515233eb2edaa6d72eb85c50d64f2300e",
+#       "details": {
+#         "format": "gguf",
+#         "family": "llama",
+#         "families": null,
+#         "parameter_size": "7B",
+#         "quantization_level": "Q4_0"
+#       }
+#     }
+#   ]
+# }
+# when no model is available or an exception, just return an empty list
+def list_ollama_models(host: str = "localhost", port: int = 11434, https: bool = False) -> List[str]:
+    """
+    List all available Ollama models by hitting the api endpoint
+
+    Args:
+        host (str): Ollama host
+        port (int): Ollama port
+        https (bool): Use https or not
+    """
+    protocol = "https" if https else "http"
+    try:
+        response = requests.get(f"{protocol}://{host}:{port}/api/tags")
+        response.raise_for_status()
+        return [f'ollama-{model["name"]}' for model in response.json()["models"]]
+    except:
+        return []
+
+# List all openai models
+
+
+def list_openai_models() -> List[str]:
+    """
+    List all available OpenAI models
+
+    Sample Response:
+    {
+      "object": "list",
+      "data": [
+        {
+          "id": "model-id-0",
+          "object": "model",
+          "created": 1686935002,
+          "owned_by": "organization-owner"
+        },
+        {
+          "id": "model-id-1",
+          "object": "model",
+          "created": 1686935002,
+          "owned_by": "organization-owner",
+        },
+        {
+          "id": "model-id-2",
+          "object": "model",
+          "created": 1686935002,
+          "owned_by": "openai"
+        },
+      ],
+      "object": "list"
+    }
+    """
+    client = OpenAI()
+    response = client.models.list()
+    # Only use model id starting with "gpt-4o-"
+    return [f'{model.id}' for model in response.data if model.id.startswith("gpt-4o-")]
+
+
+def list_anthropic_models() -> List[str]:
+    """
+    List all available Anthropic models
+    """
+    if os.getenv("ANTHROPIC_API_KEY"):
+        return ["claude-3-5-sonnet-20240620"]
+    else:
+        return []
+
+
+def list_available_llm() -> List[str]:
+    """
+    List all available models
+    """
+    return list_ollama_models() + list_openai_models() + list_anthropic_models()

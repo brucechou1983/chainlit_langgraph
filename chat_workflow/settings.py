@@ -1,24 +1,7 @@
-import os
 import chainlit as cl
 from chainlit.input_widget import Select
-from dotenv import load_dotenv
 from typing import List
-
-load_dotenv()
-
-chat_models = ["ollama-llama3.2"]
-
-if os.getenv("ANTHROPIC_API_KEY"):
-    chat_models.append("claude-3-5-sonnet-20240620")
-if os.getenv("OPENAI_API_KEY"):
-    chat_models.append("gpt-4o-2024-08-06")
-
-
-available_search_engines = []
-if os.getenv("TAVILY_API_KEY"):
-    available_search_engines.append("tavily")
-# if os.getenv("BRAVE_SEARCH_API_KEY"):
-#     available_search_engines.append("brave")
+from .llm import list_available_llm
 
 
 async def get_chat_settings(workflows: List) -> cl.ChatSettings:
@@ -33,7 +16,7 @@ async def get_chat_settings(workflows: List) -> cl.ChatSettings:
         Select(
             id="chat_model",
             label="Chat Model",
-            values=chat_models,
+            values=list_available_llm(),
             initial_index=0,
         ),
     ]

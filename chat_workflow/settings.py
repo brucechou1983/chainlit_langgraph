@@ -16,7 +16,7 @@ async def get_chat_settings(workflows: List) -> cl.ChatSettings:
         Select(
             id="chat_model",
             label="Chat Model",
-            values=list_available_llm(),
+            values=sorted(list_available_llm()),
             initial_index=0,
         ),
     ]

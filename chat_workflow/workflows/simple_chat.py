@@ -17,14 +17,14 @@ class GraphState(ChatState):
 class SimpleChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
-        self.tools = [get_datetime_now]
+        self.tools = [get_datetime_now, search]
 
-    def enrich_tools(self):
-        # TODO: check if tools are valid
-        self.tools.append(search)
+    # def enrich_tools(self):
+    #     # TODO: check if tools are valid
+    #     self.tools.append(search)
 
     def create_graph(self) -> StateGraph:
-        self.enrich_tools()
+        # self.enrich_tools()
 
         graph = StateGraph(GraphState)
         graph.add_node("chat", self.chat_node)
@@ -43,6 +43,7 @@ class SimpleChatWorkflow(BaseWorkflow):
         ])
         llm = create_chat_model(
             "chat_model", model=state["chat_model"], tools=self.tools)
+        print(f"llm: {llm}")
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke(state, config=config)]

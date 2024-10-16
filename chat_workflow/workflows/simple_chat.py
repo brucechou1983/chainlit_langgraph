@@ -1,4 +1,3 @@
-import os
 import chainlit as cl
 from chainlit.input_widget import Select
 from langgraph.graph import StateGraph, END

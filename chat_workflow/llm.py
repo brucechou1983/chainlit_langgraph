@@ -26,12 +26,7 @@ def _create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
 
 def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:
     if re.match(r"^claude-*", model):
-        extra_headers = {
-            "anthropic-beta": "prompt-caching-2024-07-31"
-        }
-        llm = ChatAnthropic(name=name, model=model,
-                            extra_headers=extra_headers, **kwargs)
-        # llm = ChatAnthropic(name=name, model=model, **kwargs)
+        llm = ChatAnthropic(name=name, model=model, **kwargs)
     elif re.match(r"^gpt-*", model):
         llm = ChatOpenAI(name=name, model=model, **kwargs)
     elif match := re.match(r"^ollama-(.*)", model):

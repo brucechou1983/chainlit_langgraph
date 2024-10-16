@@ -10,10 +10,16 @@ from langgraph.graph import StateGraph
 class BaseWorkflow(ABC):
     @abstractmethod
     def create_graph(self) -> StateGraph:
+        """
+        Define the state graph of the workflow.
+        """
         pass
 
     @abstractmethod
     def create_default_state(self) -> Dict[str, Any]:
+        """
+        Define the default state of the workflow.
+        """
         pass
 
     @property
@@ -24,16 +30,29 @@ class BaseWorkflow(ABC):
     @property
     @abstractmethod
     def output_chat_model(self) -> str:
+        """
+        The name of the chat model to display in the UI. 
+        Normally, this is the name of the chat model that is 
+        used to generate the final output.
+        """
         pass
 
     @property
     @abstractmethod
     def chat_profile(self) -> cl.ChatProfile:
+        """
+        Chat profile to display in the UI. This is for providing
+        an option in the list of available workflows to the user.
+        """
         pass
 
     @property
     @abstractmethod
     def chat_settings(self) -> cl.ChatSettings:
+        """
+        Chatt settings to display in the UI. This is for providing
+        customizable settings to the user.
+        """
         pass
 
 

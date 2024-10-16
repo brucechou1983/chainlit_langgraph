@@ -140,9 +140,12 @@ def list_openai_models() -> List[str]:
 def list_anthropic_models() -> List[str]:
     """
     List all available Anthropic models
+
+    Currently, the Anthropic Python module does not offer a direct API 
+    endpoint to list all available Claude models.
     """
     if os.getenv("ANTHROPIC_API_KEY"):
-        return ["claude-3-5-sonnet-20240620"]
+        return ["claude-3-5-sonnet-20240620", "claude-3-haiku-20240307"]
     else:
         return []
 

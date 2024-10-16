@@ -55,6 +55,12 @@ class BaseWorkflow(ABC):
         """
         pass
 
+    async def get_chat_settings(self) -> cl.ChatSettings:
+        """
+        Get the chat settings for the workflow.
+        """
+        return await self.chat_settings.send()
+
 
 class BaseState(TypedDict):
     # Message history

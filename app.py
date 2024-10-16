@@ -4,7 +4,6 @@ Simple demo of integration with ChainLit and LangGraph.
 import chainlit as cl
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
-from chat_workflow.settings import get_chat_settings
 from chat_workflow.module_discovery import discover_modules
 
 discovered_workflows = discover_modules()
@@ -30,27 +29,18 @@ async def on_chat_start():
     cl.user_session.set("state", state)
     cl.user_session.set("current_workflow", workflow_name)
 
-    await update_state_by_settings(await get_chat_settings(workflow))
+    await update_state_by_settings(await workflow.get_chat_settings())
 
 
 @cl.on_settings_update
 async def update_state_by_settings(settings: cl.ChatSettings):
     state = cl.user_session.get("state")
-    current_workflow = cl.user_session.get("current_workflow")
-
-    # Update the workflow if the workflow setting has changed
-    if "workflow" in settings and settings["workflow"] != current_workflow:
-        workflow = discovered_workflows[settings["workflow"]]
-        graph = workflow.create_graph()
-        state = workflow.create_default_state()
-        cl.user_session.set("graph", graph.compile())
-        cl.user_session.set("current_workflow", settings["workflow"])
-
-    # TODO: Update UI based on the selected workflow
-
     for key in settings.keys():
+        if key not in state:
+            print(f"Setting {key} not found in state")
+            continue
+        print(f"Setting {key} to {settings[key]}")
         state[key] = settings[key]
-
     cl.user_session.set("state", state)
 
 

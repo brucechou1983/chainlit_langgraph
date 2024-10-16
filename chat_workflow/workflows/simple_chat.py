@@ -89,19 +89,6 @@ class SimpleChatWorkflow(BaseWorkflow):
             #         label="Programming",
             #         message="Write a snake game in Python.",
             #     ),
-            #     cl.Starter(
-            #         label="Learning",
-            #         message="Explain the concept of dynamic programming.",
-            #     ),
-            #     cl.Starter(
-            #         label="Writing",
-            #         message="Write a short story about a robot learning to love.",
-            #     ),
-            #     cl.Starter(
-            #         label="Interview",
-            #         message="Ask me a question about my experience.",
-            #     ),
-            # ]
         )
 
     @property

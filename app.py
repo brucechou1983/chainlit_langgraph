@@ -33,7 +33,7 @@ async def chat_profile():
 
 @cl.on_chat_start
 async def on_chat_start():
-    workflow_name = "simple_chat"  # Default workflow
+    workflow_name = cl.context.session.chat_profile
     logger.info(f"Starting chat with workflow: {workflow_name}")
     workflow = discovered_workflows[workflow_name]
 

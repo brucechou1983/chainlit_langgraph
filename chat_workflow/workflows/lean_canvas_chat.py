@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
-from ..llm import create_chat_model, list_available_llm
+from ..llm import create_chat_model, list_available_llm, list_ollama_models
 from ..tools import BasicToolNode
 from ..tools.search import search
 from ..tools.time import get_datetime_now
@@ -16,7 +16,7 @@ class GraphState(BaseState):
     chat_model: str
 
 
-class SimpleChatWorkflow(BaseWorkflow):
+class LeanCanvasChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
 
@@ -71,7 +71,7 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     @property
     def name(self) -> str:
-        return "Simple Chat"
+        return "Lean Canvas Chat"
 
     @property
     def output_chat_model(self) -> str:
@@ -81,14 +81,9 @@ class SimpleChatWorkflow(BaseWorkflow):
     def chat_profile(self) -> cl.ChatProfile:
         return cl.ChatProfile(
             name=self.name,
-            markdown_description="A ChatGPT-like chatbot.",
-            icon="https://picsum.photos/150",
-            # default=True,
-            # starters=[
-            #     cl.Starter(
-            #         label="Programming",
-            #         message="Write a snake game in Python.",
-            #     ),
+            markdown_description="A Business Modeling Assistant",
+            icon="https://picsum.photos/151",
+            default=True,
         )
 
     @property
@@ -97,7 +92,8 @@ class SimpleChatWorkflow(BaseWorkflow):
             Select(
                 id="chat_model",
                 label="Chat Model",
-                values=sorted(list_available_llm()),
+                # values=sorted(list_available_llm()),
+                values=sorted(list_ollama_models()),
                 initial_index=0,
             ),
         ])

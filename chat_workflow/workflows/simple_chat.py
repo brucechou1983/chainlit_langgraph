@@ -1,10 +1,12 @@
 import os
+import chainlit as cl
+from chainlit.input_widget import Select
 from langgraph.graph import StateGraph, END
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
-from ..llm import create_chat_model
+from ..llm import create_chat_model, list_available_llm
 from ..tools import BasicToolNode
 from ..tools.search import search
 from ..tools.time import get_datetime_now
@@ -49,7 +51,7 @@ class SimpleChatWorkflow(BaseWorkflow):
         return {
             "name": "simple_chat",
             "messages": [],
-            "chat_model": os.getenv("CHAT_MODEL", "ollama-llama3.2"),
+            "chat_model": "",
         }
 
     def tool_routing(self, state: GraphState):
@@ -75,3 +77,41 @@ class SimpleChatWorkflow(BaseWorkflow):
     @property
     def output_chat_model(self) -> str:
         return "chat_model"
+
+    @property
+    def chat_profile(self) -> cl.ChatProfile:
+        return cl.ChatProfile(
+            name="Simple Chat",
+            markdown_description="A ChatGPT-like chatbot.",
+            icon="https://picsum.photos/150",
+            default=True,
+            # starters=[
+            #     cl.Starter(
+            #         label="Programming",
+            #         message="Write a snake game in Python.",
+            #     ),
+            #     cl.Starter(
+            #         label="Learning",
+            #         message="Explain the concept of dynamic programming.",
+            #     ),
+            #     cl.Starter(
+            #         label="Writing",
+            #         message="Write a short story about a robot learning to love.",
+            #     ),
+            #     cl.Starter(
+            #         label="Interview",
+            #         message="Ask me a question about my experience.",
+            #     ),
+            # ]
+        )
+
+    @property
+    def chat_settings(self) -> cl.ChatSettings:
+        return cl.ChatSettings([
+            Select(
+                id="chat_model",
+                label="Chat Model",
+                values=sorted(list_available_llm()),
+                initial_index=0,
+            ),
+        ])

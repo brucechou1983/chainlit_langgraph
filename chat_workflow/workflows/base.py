@@ -1,4 +1,5 @@
 import operator
+import chainlit as cl
 from typing import TypedDict, Annotated, Sequence, Dict
 from langchain_core.messages import AnyMessage
 from abc import ABC, abstractmethod
@@ -23,6 +24,16 @@ class BaseWorkflow(ABC):
     @property
     @abstractmethod
     def output_chat_model(self) -> str:
+        pass
+
+    @property
+    @abstractmethod
+    def chat_profile(self) -> cl.ChatProfile:
+        pass
+
+    @property
+    @abstractmethod
+    def chat_settings(self) -> cl.ChatSettings:
         pass
 
 

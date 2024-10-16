@@ -10,6 +10,14 @@ from chat_workflow.module_discovery import discover_modules
 discovered_workflows = discover_modules()
 
 
+@cl.set_chat_profiles
+async def chat_profile():
+    profiles = []
+    for workflow in discovered_workflows.values():
+        profiles.append(workflow.chat_profile)
+    return profiles
+
+
 @cl.on_chat_start
 async def on_chat_start():
     workflow_name = "simple_chat"  # Default workflow
@@ -22,7 +30,7 @@ async def on_chat_start():
     cl.user_session.set("state", state)
     cl.user_session.set("current_workflow", workflow_name)
 
-    await update_state_by_settings(await get_chat_settings(discovered_workflows.keys()))
+    await update_state_by_settings(await get_chat_settings(workflow))
 
 
 @cl.on_settings_update

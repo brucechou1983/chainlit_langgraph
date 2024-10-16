@@ -9,6 +9,7 @@ from langchain_core.runnables import Runnable
 from chainlit.logger import logger
 from chat_workflow.module_discovery import discover_modules
 from dotenv import load_dotenv
+from typing import Dict, Optional
 
 load_dotenv()
 
@@ -20,6 +21,17 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
 discovered_workflows = discover_modules()
 logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
+
+
+@cl.oauth_callback
+def oauth_callback(
+    provider_id: str,
+    token: str,
+    raw_user_data: Dict[str, str],
+    default_user: cl.User,
+) -> Optional[cl.User]:
+    # TODO: user filtering
+    return default_user
 
 
 @cl.set_chat_profiles

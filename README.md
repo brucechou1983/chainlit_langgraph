@@ -9,10 +9,10 @@ This repository provides a demo showcasing the integration between Chainlit and 
 ## **Features**
 - **Chainlit**: A powerful tool for creating interactive interfaces for AI models.
 - **LangGraph**: Enables the creation of complex language agentic workflows.
-- **Multiple LLM Support**: 
-  - **Llama 3.2** via **Ollama**: High-performance open-source language model.
-  - **Claude 3.5 Sonnet**: Advanced AI model by Anthropic.
-  - **GPT-4o**: State-of-the-art language model by OpenAI.
+- **Multiple LLM Support**: Automaatically detects and uses the following LLMs:
+  - **Ollama**: Open source model.
+  - **Claude**: Advanced AI models by Anthropic.
+  - **GPT**: Advanced AI models by OpenAI.
 - **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
 - **Search Engine**: Search for information from the web.
 - Easy-to-follow setup with **Poetry** for dependency management.
@@ -21,71 +21,52 @@ This repository provides a demo showcasing the integration between Chainlit and 
 - **Image Input**: User can upload images and interact with them.
 - **Image Generation**: Generate images based on user input.
 - **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
-  
+
 ## **Installation Guide**
-Follow these steps to set up and run the project in your Python 3.10 virtual environment.
+Follow these steps to set up and run the project using Docker Compose or in your Python 3.10 virtual environment.
 
-### **Step 1: Python Requirements**
-Make sure you have Python 3.10 installed. Then, install the necessary dependencies by running the following commands:
-
-```bash
-pip install --upgrade pip
-pip install poetry
-poetry install
-```
-
-### **Step 2: Setting Up LLMs**
-This demo supports multiple LLMs. Setup the appropriate environment variables in the `.env` file. See the `.env.example` file for reference.
-
-```
-# LLM API
-OPENAI_API_KEY=
-ANTHROPIC_API_KEY=
-
-# Search Engine
-TAVILY_API_KEY=
-BRAVE_SEARCH_API_KEY=
-```
-
-#### Ollama (for Llama 3.2):
-1. Download and install [Ollama](https://ollama.com/download).
-2. Pull the required Llama model:
+1. Make sure you have Docker and Docker Compose installed on your system.
+2. Clone this repository and navigate to the project directory.
+3. Copy the `.env.example` file to `.env` and update the necessary environment variables:
 
 ```bash
-ollama pull llama3.2
+cp .env.example .env
 ```
 
-3. Start the Ollama server:
+4. Edit the .env file and set the required variables, including:
+
+  - API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, TAVILY_API_KEY)
+  - DB volume settings (POSTGRES_VOLUME_PATH, MINIO_VOLUME_PATH)
+  - (Optional) Google OAuth
+  - (Optional) LangSmith
+
+5. Start the services using Docker Compose
 
 ```bash
-ollama serve
+docker compose up
 ```
 
-
-#### Claude 3.5 Sonnet:
-1. Sign up for an Anthropic API key at [anthropic](https://www.anthropic.com/api)
-2. Set your API key as an environment variable:
-
-export ANTHROPIC_API_KEY=your_api_key_here
-
-#### GPT-4o:
-1. Sign up for an OpenAI API key at [OpenAI](https://openai.com/index/openai-api/)
-2. Set your API key as an environment variable:
-
-export OPENAI_API_KEY=your_api_key_here
+This will start all the necessary services, including the Chainlit application, PostgreSQL database, and MinIO object storage.
 
 
-Please note that you can select the LLM for the chatbot in the settings menu next to the text field in the demo.
+### Setting up Ollama (Optional)
 
-### **Step 3: Running the Demo**
-After completing the above steps, run the Chainlit demo using the following command:
+1. Download and install [Ollama](https://ollama.com).
+2. Pull whatever model you want to use, for example: 
 
 ```bash
-chainlit run app.py --port 8000
+ollama pull cas/ministral-8b-instruct-2410_q4km:latest
+ollama pull llama3.2:3b-instruct-q8_0
 ```
 
+of any gguf-based model on the [HuggingFace](https://huggingface.co/docs/hub/ollama).
 
-This will start the demo on **port 8000**, providing a user interface to interact with the Langgraph integration powered by your chosen LLM.
+```bash
+ollama run hf.co/{username}/{repository}:{quantization}
+```
+
+![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/ollama/guide.png)
+
 
 ## **Creating Your Own Workflow**
 - Inherit from the `BaseWorkflow` and `BaseState` classes. For more details, refer to the [Simple Chat Workflow](./chat_workflow/workflows/simple_chat.py) example.
@@ -98,4 +79,3 @@ This will start the demo on **port 8000**, providing a user interface to interac
 ## **Additional Resources**
 - [Chainlit Documentation](https://docs.chainlit.io/get-started/overview)
 - [Langgraph Documentation](https://langchain-ai.github.io/langgraph/)
-- [Ollama Llama 3.2 Model Info](https://ollama.com/library/llama3.2)

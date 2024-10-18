@@ -18,7 +18,7 @@ class BasicToolNode(Runnable):
             raise ValueError("No message found in input")
         outputs = []
         for tool_call in message.tool_calls:
-            async with cl.Step(f"Running tool {tool_call['name']}") as step:
+            async with cl.Step(f"tool [{tool_call['name']}]") as step:
                 tool_result = await self.tools_by_name[tool_call["name"]](**tool_call["args"])
                 outputs.append(
                     ToolMessage(

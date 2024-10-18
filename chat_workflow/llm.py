@@ -20,18 +20,13 @@ def _create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
             "<|end_header_id|>",
             "<|eot_id|>"
         ]
-
-    return ChatOllama(name=name, model=model, stop=stop, **kwargs)
+    return ChatOllama(name=name, model=model, stop=stop,
+                      base_url=os.getenv("OLLAMA_URL", "http://localhost:11434"), **kwargs)
 
 
 def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:
     if re.match(r"^claude-*", model):
-        extra_headers = {
-            "anthropic-beta": "prompt-caching-2024-07-31"
-        }
-        llm = ChatAnthropic(name=name, model=model,
-                            extra_headers=extra_headers, **kwargs)
-        # llm = ChatAnthropic(name=name, model=model, **kwargs)
+        llm = ChatAnthropic(name=name, model=model, **kwargs)
     elif re.match(r"^gpt-*", model):
         llm = ChatOpenAI(name=name, model=model, **kwargs)
     elif match := re.match(r"^ollama-(.*)", model):
@@ -81,18 +76,15 @@ def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwa
 #   ]
 # }
 # when no model is available or an exception, just return an empty list
-def list_ollama_models(host: str = "localhost", port: int = 11434, https: bool = False) -> List[str]:
+def list_ollama_models(url: str = "http://localhost:11434") -> List[str]:
     """
     List all available Ollama models by hitting the api endpoint
 
     Args:
-        host (str): Ollama host
-        port (int): Ollama port
-        https (bool): Use https or not
+        url (str): The url of the Ollama API endpoint
     """
-    protocol = "https" if https else "http"
     try:
-        response = requests.get(f"{protocol}://{host}:{port}/api/tags")
+        response = requests.get(f"{url}/api/tags")
         response.raise_for_status()
         return [f'ollama-{model["name"]}' for model in response.json()["models"]]
     except:
@@ -140,9 +132,12 @@ def list_openai_models() -> List[str]:
 def list_anthropic_models() -> List[str]:
     """
     List all available Anthropic models
+
+    Currently, the Anthropic Python module does not offer a direct API 
+    endpoint to list all available Claude models.
     """
     if os.getenv("ANTHROPIC_API_KEY"):
-        return ["claude-3-5-sonnet-20240620"]
+        return ["claude-3-5-sonnet-20240620", "claude-3-haiku-20240307"]
     else:
         return []
 
@@ -151,4 +146,4 @@ def list_available_llm() -> List[str]:
     """
     List all available models
     """
-    return list_ollama_models() + list_openai_models() + list_anthropic_models()
+    return list_ollama_models(os.getenv("OLLAMA_URL", "http://localhost:11434")) + list_openai_models() + list_anthropic_models()

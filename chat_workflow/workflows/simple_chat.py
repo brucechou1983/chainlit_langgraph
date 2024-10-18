@@ -48,7 +48,7 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     def create_default_state(self) -> GraphState:
         return {
-            "name": "simple_chat",
+            "name": self.name,
             "messages": [],
             "chat_model": "",
         }
@@ -71,7 +71,7 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     @property
     def name(self) -> str:
-        return "simple_chat"
+        return "Simple Chat"
 
     @property
     def output_chat_model(self) -> str:
@@ -80,10 +80,10 @@ class SimpleChatWorkflow(BaseWorkflow):
     @property
     def chat_profile(self) -> cl.ChatProfile:
         return cl.ChatProfile(
-            name="Simple Chat",
+            name=self.name,
             markdown_description="A ChatGPT-like chatbot.",
             icon="https://picsum.photos/150",
-            default=True,
+            # default=True,
             # starters=[
             #     cl.Starter(
             #         label="Programming",

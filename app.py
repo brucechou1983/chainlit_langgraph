@@ -2,13 +2,18 @@
 Simple demo of integration with ChainLit and LangGraph.
 """
 import chainlit as cl
+import chainlit.data as cl_data
 import logging
 import os
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
+from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.logger import logger
+from chainlit.types import ThreadDict
 from chat_workflow.module_discovery import discover_modules
+from chat_workflow.storage_client import MinIOStorageClient
 from dotenv import load_dotenv
+from typing import Dict, Optional
 
 load_dotenv()
 
@@ -20,6 +25,37 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
 discovered_workflows = discover_modules()
 logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
+
+# Persistance Layer
+storage_client = MinIOStorageClient(
+    bucket=os.getenv("MINIO_BUCKET", "chainlit_langgraph"),
+    endpoint_url=os.getenv("MINIO_ENDPOINT_URL", "http://localhost:9000"),
+    access_key=os.getenv("MINIO_ACCESS_KEY", "chainlit_langgraph"),
+    secret_key=os.getenv("MINIO_SECRET_KEY", "chainlit_langgraph"),
+)
+cl_data._data_layer = SQLAlchemyDataLayer(
+    conninfo=f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}",
+    storage_provider=storage_client
+)
+
+
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+    await on_chat_start()
+    logger.debug(thread)
+
+    # FIXME: recover messages
+
+
+@cl.oauth_callback
+def oauth_callback(
+    provider_id: str,
+    token: str,
+    raw_user_data: Dict[str, str],
+    default_user: cl.User,
+) -> Optional[cl.User]:
+    # TODO: user filtering
+    return default_user
 
 
 @cl.set_chat_profiles
@@ -33,7 +69,7 @@ async def chat_profile():
 
 @cl.on_chat_start
 async def on_chat_start():
-    workflow_name = "simple_chat"  # Default workflow
+    workflow_name = cl.context.session.chat_profile
     logger.info(f"Starting chat with workflow: {workflow_name}")
     workflow = discovered_workflows[workflow_name]
 

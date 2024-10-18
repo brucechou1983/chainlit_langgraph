@@ -13,14 +13,12 @@ class BaseWorkflow(ABC):
         """
         Define the state graph of the workflow.
         """
-        pass
 
     @abstractmethod
     def create_default_state(self) -> Dict[str, Any]:
         """
         Define the default state of the workflow.
         """
-        pass
 
     @property
     @abstractmethod
@@ -35,7 +33,6 @@ class BaseWorkflow(ABC):
         Normally, this is the name of the chat model that is 
         used to generate the final output.
         """
-        pass
 
     @property
     @abstractmethod
@@ -44,7 +41,6 @@ class BaseWorkflow(ABC):
         Chat profile to display in the UI. This is for providing
         an option in the list of available workflows to the user.
         """
-        pass
 
     @property
     @abstractmethod
@@ -53,7 +49,6 @@ class BaseWorkflow(ABC):
         Chatt settings to display in the UI. This is for providing
         customizable settings to the user.
         """
-        pass
 
     async def get_chat_settings(self) -> cl.ChatSettings:
         """

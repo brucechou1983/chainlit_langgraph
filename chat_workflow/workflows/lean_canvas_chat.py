@@ -56,7 +56,7 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
             name=self.name,
             markdown_description="A Business Modeling Assistant",
             icon="https://picsum.photos/151",
-            default=True,
+            # default=True,
         )
 
     @property

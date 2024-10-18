@@ -83,7 +83,7 @@ class SimpleChatWorkflow(BaseWorkflow):
             name=self.name,
             markdown_description="A ChatGPT-like chatbot.",
             icon="https://picsum.photos/150",
-            # default=True,
+            default=True,
             # starters=[
             #     cl.Starter(
             #         label="Programming",

@@ -2,12 +2,16 @@
 Simple demo of integration with ChainLit and LangGraph.
 """
 import chainlit as cl
+import chainlit.data as cl_data
 import logging
 import os
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
+from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.logger import logger
+from chainlit.types import ThreadDict
 from chat_workflow.module_discovery import discover_modules
+from chat_workflow.storage_client import MinIOStorageClient
 from dotenv import load_dotenv
 from typing import Dict, Optional
 
@@ -21,6 +25,26 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
 discovered_workflows = discover_modules()
 logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
+
+# Persistance Layer
+storage_client = MinIOStorageClient(
+    bucket=os.getenv("MINIO_BUCKET", "chainlit_langgraph"),
+    endpoint_url=os.getenv("MINIO_ENDPOINT_URL", "http://localhost:9000"),
+    access_key=os.getenv("MINIO_ACCESS_KEY", "chainlit_langgraph"),
+    secret_key=os.getenv("MINIO_SECRET_KEY", "chainlit_langgraph"),
+)
+cl_data._data_layer = SQLAlchemyDataLayer(
+    conninfo=f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}",
+    storage_provider=storage_client
+)
+
+
+@cl.on_chat_resume
+async def on_chat_resume(thread: ThreadDict):
+    await on_chat_start()
+    logger.debug(thread)
+
+    # FIXME: recover messages
 
 
 @cl.oauth_callback

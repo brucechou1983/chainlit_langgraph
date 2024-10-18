@@ -15,15 +15,15 @@ services:
       - postgres
       - minio
     command: >
-      sh -c "
+      sh -c '
         ./wait-for-it.sh postgres:5432 -t 60 --
         alembic upgrade head &&
-        if [ \"$MODE\" = \"dev\" ]; then
+        if [ "$MODE" = "dev" ]; then
           python -m chainlit run app.py --port 8000 --watch --host 0.0.0.0
         else
           python -m chainlit run app.py --port 8000 --host 0.0.0.0
         fi
-      "
+      '
 
   postgres:
     image: postgres:16.1

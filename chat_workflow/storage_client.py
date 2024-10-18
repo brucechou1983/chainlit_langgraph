@@ -4,7 +4,7 @@ import uuid
 from typing import Any, Dict, Union
 from chainlit.logger import logger
 from chainlit.data.base import BaseStorageClient
-from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text
+from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -132,3 +132,10 @@ class Feedback(Base):
     comment = Column(Text)
 
     thread = relationship("Thread", backref="feedbacks")
+
+
+class LangGraph(Base):
+    __tablename__ = 'langgraphs'
+    thread_id = Column(String, primary_key=True)
+    state = Column(JSON, nullable=False)
+    workflow = Column(String, nullable=False)

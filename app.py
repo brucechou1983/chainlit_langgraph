@@ -1,6 +1,7 @@
 """
 Simple demo of integration with ChainLit and LangGraph.
 """
+from chat_workflow.workflows.simple_chat import GraphState
 import chainlit as cl
 import chainlit.data as cl_data
 import logging
@@ -11,9 +12,13 @@ from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.logger import logger
 from chainlit.types import ThreadDict
 from chat_workflow.module_discovery import discover_modules
-from chat_workflow.storage_client import MinIOStorageClient
+from chat_workflow.storage_client import MinIOStorageClient, LangGraph
+from chat_workflow.state_serializer import StateSerializer
 from dotenv import load_dotenv
 from typing import Dict, Optional
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+
 
 load_dotenv()
 
@@ -26,6 +31,8 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 discovered_workflows = discover_modules()
 logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
 
+pg_url = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}"
+
 # Persistance Layer
 storage_client = MinIOStorageClient(
     bucket=os.getenv("MINIO_BUCKET", "chainlit_langgraph"),
@@ -34,17 +41,75 @@ storage_client = MinIOStorageClient(
     secret_key=os.getenv("MINIO_SECRET_KEY", "chainlit_langgraph"),
 )
 cl_data._data_layer = SQLAlchemyDataLayer(
-    conninfo=f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}",
+    conninfo=pg_url,
     storage_provider=storage_client
 )
 
 
+@cl.on_chat_end
+async def on_chat_end():
+    """
+    Save the chat state to the database before the chat ends
+    """
+    state = cl.user_session.get("state")
+    workflow_name = cl.user_session.get("current_workflow")
+    thread_id = cl.context.session.thread_id
+
+    engine = create_async_engine(pg_url)
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False)
+
+    try:
+        async with async_session() as session:
+            graph = LangGraph(
+                thread_id=thread_id,
+                state=StateSerializer.serialize(state),
+                workflow=workflow_name,
+            )
+            session.add(graph)
+            await session.commit()
+        logger.info(f"Successfully saved LangGraph for thread_id: {thread_id}")
+    except Exception as e:
+        logger.error(f"Error saving LangGraph: {str(e)}")
+
+# FIXME
+
+
 @cl.on_chat_resume
 async def on_chat_resume(thread: ThreadDict):
-    await on_chat_start()
-    logger.debug(thread)
+    # Retrieve the LangGraph from the database
+    engine = create_async_engine(pg_url)
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False)
 
-    # FIXME: recover messages
+    graph: Optional[LangGraph] = None
+    state: Optional[Dict] = None
+    async with async_session() as session:
+        graph = await session.get(LangGraph, thread["id"])
+        if graph:
+            state = StateSerializer.deserialize(graph.state, GraphState)
+            cl.user_session.set("state", state)
+            cl.user_session.set("current_workflow", graph.workflow)
+
+    # Load the Graph
+    if graph:
+        await start_langgraph(graph.workflow, state)
+
+
+async def start_langgraph(workflow_name: str, state: Optional[Dict] = None):
+    """
+    Load the Graph
+    """
+    workflow = discovered_workflows[workflow_name]
+    cl.user_session.set("current_workflow", workflow_name)
+    graph = workflow.create_graph()
+    cl.user_session.set("graph", graph.compile())
+    if state is None:
+        state = workflow.create_default_state()
+        cl.user_session.set("state", state)
+        logger.debug(f"Initial state set: {state}")
+    chat_settings = await workflow.get_chat_settings()
+    await update_state_by_settings(chat_settings)
 
 
 @cl.oauth_callback
@@ -70,19 +135,7 @@ async def chat_profile():
 @cl.on_chat_start
 async def on_chat_start():
     workflow_name = cl.context.session.chat_profile
-    logger.info(f"Starting chat with workflow: {workflow_name}")
-    workflow = discovered_workflows[workflow_name]
-
-    graph = workflow.create_graph()
-    state = workflow.create_default_state()
-
-    cl.user_session.set("graph", graph.compile())
-    cl.user_session.set("state", state)
-    cl.user_session.set("current_workflow", workflow_name)
-    logger.debug(f"Initial state set: {state}")
-
-    chat_settings = await workflow.get_chat_settings()
-    await update_state_by_settings(chat_settings)
+    await start_langgraph(workflow_name)
     logger.info("Chat started and initialized")
 
 

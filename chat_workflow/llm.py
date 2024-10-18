@@ -20,8 +20,8 @@ def _create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
             "<|end_header_id|>",
             "<|eot_id|>"
         ]
-
-    return ChatOllama(name=name, model=model, stop=stop, **kwargs)
+    return ChatOllama(name=name, model=model, stop=stop,
+                      base_url=os.getenv("OLLAMA_URL", "http://localhost:11434"), **kwargs)
 
 
 def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:

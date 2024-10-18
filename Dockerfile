@@ -25,11 +25,11 @@ RUN poetry config virtualenvs.create false && \
 # Copy the rest of the application code
 COPY . /app
 
-EXPOSE 8080
+EXPOSE 8000
 
 # Set the command based on the build mode
 CMD if [ "$MODE" = "dev" ]; then \
-        python -m chainlit run app.py -d --port 8080 --host 0.0.0.0 --watch; \
+        python -m chainlit run app.py -d --port 8000 --host 0.0.0.0 --watch; \
     else \
-        python -m chainlit run app.py --port 8080 --host 0.0.0.0; \
+        python -m chainlit run app.py --port 8000 --host 0.0.0.0; \
     fi

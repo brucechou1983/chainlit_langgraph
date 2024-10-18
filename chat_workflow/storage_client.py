@@ -8,7 +8,6 @@ from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from sqlalchemy.orm import relationship
 
 
 class MinIOStorageClient(BaseStorageClient):

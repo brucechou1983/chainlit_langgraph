@@ -1,11 +1,11 @@
 """
 Simple demo of integration with ChainLit and LangGraph.
 """
-from chat_workflow.workflows.simple_chat import GraphState
 import chainlit as cl
 import chainlit.data as cl_data
 import logging
 import os
+import importlib
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.runnables import Runnable
 from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
@@ -52,7 +52,7 @@ async def on_chat_end():
     Save the chat state to the database before the chat ends
     """
     state = cl.user_session.get("state")
-    workflow_name = cl.user_session.get("current_workflow")
+    workflow_name = state["chat_profile"]
     thread_id = cl.context.session.thread_id
 
     engine = create_async_engine(pg_url)
@@ -82,34 +82,46 @@ async def on_chat_resume(thread: ThreadDict):
     async_session = sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False)
 
-    graph: Optional[LangGraph] = None
+    db_graph: Optional[LangGraph] = None
     state: Optional[Dict] = None
     async with async_session() as session:
-        graph = await session.get(LangGraph, thread["id"])
-        if graph:
-            state = StateSerializer.deserialize(graph.state, GraphState)
+        db_graph = await session.get(LangGraph, thread["id"])
+        if db_graph:
+            chat_profile = db_graph.workflow
+            workflow = discovered_workflows[chat_profile]
+            workflow_module = workflow.__class__.__module__
+            GraphState = getattr(importlib.import_module(
+                workflow_module), "GraphState")
+            state = StateSerializer.deserialize(db_graph.state, GraphState)
             cl.user_session.set("state", state)
-            cl.user_session.set("current_workflow", graph.workflow)
 
     # Load the Graph
-    if graph:
-        await start_langgraph(graph.workflow, state)
+    if db_graph:
+        await start_langgraph(state["chat_profile"], state)
 
 
-async def start_langgraph(workflow_name: str, state: Optional[Dict] = None):
+async def start_langgraph(chat_profile: str, state: Optional[Dict] = None):
     """
     Load the Graph
+
+    Args:
+        chat_profile (str): The name of the chat profile to load.
+        state (Optional[Dict]): The state to load.
     """
-    workflow = discovered_workflows[workflow_name]
-    cl.user_session.set("current_workflow", workflow_name)
+    workflow = discovered_workflows[chat_profile]
     graph = workflow.create_graph()
     cl.user_session.set("graph", graph.compile())
-    if state is None:
-        state = workflow.create_default_state()
+    if state:
+        # Resume from previous state
+        state["chat_profile"] = chat_profile
         cl.user_session.set("state", state)
-        logger.debug(f"Initial state set: {state}")
-    chat_settings = await workflow.get_chat_settings()
-    await update_state_by_settings(chat_settings)
+        await workflow.get_chat_settings(state)
+    else:
+        # Create new state
+        state = workflow.create_default_state()
+        state["chat_profile"] = chat_profile
+        cl.user_session.set("state", state)
+        await update_state_by_settings(await workflow.get_chat_settings())
 
 
 @cl.oauth_callback
@@ -134,8 +146,7 @@ async def chat_profile():
 
 @cl.on_chat_start
 async def on_chat_start():
-    workflow_name = cl.context.session.chat_profile
-    await start_langgraph(workflow_name)
+    await start_langgraph(cl.context.session.chat_profile)
     logger.info("Chat started and initialized")
 
 
@@ -160,9 +171,8 @@ async def on_message(message: cl.Message):
 
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
-    current_workflow = cl.user_session.get("current_workflow")
-    workflow = discovered_workflows[current_workflow]
-    logger.debug(f"Current workflow: {current_workflow}")
+    workflow = discovered_workflows[state["chat_profile"]]
+    logger.debug(f"Chat Profile: {chat_profile}")
 
     state["messages"] += [HumanMessage(content=message.content)]
     logger.debug(

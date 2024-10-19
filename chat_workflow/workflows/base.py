@@ -1,10 +1,17 @@
 import operator
 import chainlit as cl
-from typing import TypedDict, Annotated, Sequence, Dict
+from typing import TypedDict, Annotated, Sequence, Dict, Optional
 from langchain_core.messages import AnyMessage
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 from langgraph.graph import StateGraph
+
+
+class BaseState(TypedDict):
+    # Message history
+    messages: Annotated[Sequence[AnyMessage], operator.add]
+
+    chat_profile: str
 
 
 class BaseWorkflow(ABC):
@@ -50,13 +57,28 @@ class BaseWorkflow(ABC):
         customizable settings to the user.
         """
 
-    async def get_chat_settings(self) -> cl.ChatSettings:
+    async def get_chat_settings(self, state: Optional[BaseState] = None) -> cl.ChatSettings:
         """
         Get the chat settings for the workflow.
+
+        Args:
+            state (Optional[BaseState]): The state of the workflow. Used to resume a chat from previous session.
         """
-        return await self.chat_settings.send()
-
-
-class BaseState(TypedDict):
-    # Message history
-    messages: Annotated[Sequence[AnyMessage], operator.add]
+        settings = self.chat_settings
+        # Resume settings from previous session
+        if state is not None:
+            for widget in settings.inputs:
+                if widget.id in state:
+                    if isinstance(widget, cl.input_widget.Select):
+                        widget.initial = state[widget.id]
+                    elif isinstance(widget, cl.input_widget.Switch):
+                        widget.initial = state[widget.id]
+                    elif isinstance(widget, cl.input_widget.Slider):
+                        widget.initial = state[widget.id]
+                    elif isinstance(widget, cl.input_widget.TextInput):
+                        widget.initial = state[widget.id]
+                    elif isinstance(widget, cl.input_widget.NumberInput):
+                        widget.initial = state[widget.id]
+                    elif isinstance(widget, cl.input_widget.Tags):
+                        widget.initial = state[widget.id]
+        return await settings.send()

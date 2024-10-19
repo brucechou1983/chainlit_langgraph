@@ -70,15 +70,29 @@ class BaseWorkflow(ABC):
             for widget in settings.inputs:
                 if widget.id in state:
                     if isinstance(widget, cl.input_widget.Select):
-                        widget.initial = state[widget.id]
+                        if widget.items:
+                            if state[widget.id] in widget.items.values():
+                                widget.initial = state[widget.id]
+                        elif widget.values:
+                            if state[widget.id] in widget.values:
+                                widget.initial = state[widget.id]
                     elif isinstance(widget, cl.input_widget.Switch):
                         widget.initial = state[widget.id]
                     elif isinstance(widget, cl.input_widget.Slider):
-                        widget.initial = state[widget.id]
+                        if widget.min > state[widget.id]:
+                            widget.initial = widget.min
+                        elif widget.max < state[widget.id]:
+                            widget.initial = widget.max
+                        else:
+                            widget.initial = state[widget.id]
                     elif isinstance(widget, cl.input_widget.TextInput):
                         widget.initial = state[widget.id]
                     elif isinstance(widget, cl.input_widget.NumberInput):
                         widget.initial = state[widget.id]
                     elif isinstance(widget, cl.input_widget.Tags):
-                        widget.initial = state[widget.id]
+                        if widget.values:
+                            widget.initial = [
+                                tag for tag in state[widget.id] if tag in widget.values]
+                        else:
+                            widget.initial = state[widget.id]
         return await settings.send()

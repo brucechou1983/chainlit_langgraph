@@ -162,7 +162,6 @@ async def on_chat_start():
     # This is a workaround for the fact that sometimes the thread is not created. Should be a bug in chainlit.
     async with async_session() as session:
         thread = await session.get(Thread, cl.context.session.thread_id)
-        print(f"[on_chat_start] Thread: {thread}")
         if not thread:
             thread = Thread(id=cl.context.session.thread_id)
             session.add(thread)

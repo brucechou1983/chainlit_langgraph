@@ -12,12 +12,13 @@ from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.logger import logger
 from chainlit.types import ThreadDict
 from chat_workflow.module_discovery import discover_modules
-from chat_workflow.storage_client import MinIOStorageClient, LangGraph
+from chat_workflow.storage_client import MinIOStorageClient, LangGraph, Thread
 from chat_workflow.state_serializer import StateSerializer
 from dotenv import load_dotenv
 from typing import Dict, Optional
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects.postgresql import insert
 
 
 load_dotenv()
@@ -49,7 +50,7 @@ cl_data._data_layer = SQLAlchemyDataLayer(
 @cl.on_chat_end
 async def on_chat_end():
     """
-    Save the chat state to the database before the chat ends
+    Save the chat state to the database before the chat ends using upsert
     """
     state = cl.user_session.get("state")
     workflow_name = state["chat_profile"]
@@ -61,14 +62,21 @@ async def on_chat_end():
 
     try:
         async with async_session() as session:
-            graph = LangGraph(
+            stmt = insert(LangGraph).values(
                 thread_id=thread_id,
                 state=StateSerializer.serialize(state),
                 workflow=workflow_name,
+            ).on_conflict_do_update(
+                # This upsert is necessary because we might have created the thread in the on_chat_start.
+                index_elements=['thread_id'],
+                set_=dict(
+                    state=StateSerializer.serialize(state),
+                    workflow=workflow_name,
+                )
             )
-            session.add(graph)
+            await session.execute(stmt)
             await session.commit()
-        logger.info(f"Successfully saved LangGraph for thread_id: {thread_id}")
+            logger.info(f"Upserted LangGraph for thread_id: {thread_id}")
     except Exception as e:
         logger.error(f"Error saving LangGraph: {str(e)}")
 
@@ -146,6 +154,20 @@ async def chat_profile():
 
 @cl.on_chat_start
 async def on_chat_start():
+    engine = create_async_engine(pg_url)
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False)
+
+    # Ensure Thread exists
+    # This is a workaround for the fact that sometimes the thread is not created. Should be a bug in chainlit.
+    async with async_session() as session:
+        thread = await session.get(Thread, cl.context.session.thread_id)
+        print(f"[on_chat_start] Thread: {thread}")
+        if not thread:
+            thread = Thread(id=cl.context.session.thread_id)
+            session.add(thread)
+            await session.commit()
+
     await start_langgraph(cl.context.session.chat_profile)
     logger.info("Chat started and initialized")
 

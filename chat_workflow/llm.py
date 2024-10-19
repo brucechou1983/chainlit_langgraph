@@ -123,10 +123,13 @@ def list_openai_models() -> List[str]:
       "object": "list"
     }
     """
-    client = OpenAI()
-    response = client.models.list()
-    # Only use model id starting with "gpt-4o-"
-    return [f'{model.id}' for model in response.data if model.id.startswith("gpt-4o-")]
+    try:
+        client = OpenAI()
+        response = client.models.list()
+        # Only use model id starting with "gpt-4o-"
+        return [f'{model.id}' for model in response.data if model.id.startswith("gpt-4o-")]
+    except Exception as e:
+        return []
 
 
 def list_anthropic_models() -> List[str]:

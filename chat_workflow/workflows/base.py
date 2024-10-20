@@ -4,7 +4,7 @@ from typing import TypedDict, Annotated, Sequence, Dict, Optional
 from langchain_core.messages import AnyMessage
 from abc import ABC, abstractmethod
 from typing import Dict, Any
-from langgraph.graph import StateGraph
+from langgraph.graph import StateGraph, END
 
 
 class BaseState(TypedDict):
@@ -56,6 +56,22 @@ class BaseWorkflow(ABC):
         Chatt settings to display in the UI. This is for providing
         customizable settings to the user.
         """
+
+    def tool_routing(self, state: BaseState):
+        """
+        Use in the conditional_edge to route to the ToolNode if the last message
+        has tool calls. Otherwise, route to the end.
+        """
+        if isinstance(state, list):
+            ai_message = state[-1]
+        elif messages := state.get("messages", []):
+            ai_message = messages[-1]
+        else:
+            raise ValueError(
+                f"No messages found in input state to tool_edge: {state}")
+        if hasattr(ai_message, "tool_calls") and len(ai_message.tool_calls) > 0:
+            return "tools"
+        return END
 
     async def get_chat_settings(self, state: Optional[BaseState] = None) -> cl.ChatSettings:
         """

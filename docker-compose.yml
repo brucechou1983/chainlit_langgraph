@@ -45,6 +45,8 @@ services:
       - .env
     environment:
       - MINIO_VOLUME_PATH=${MINIO_VOLUME_PATH}
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     command: server /data --console-address ":9001"
     ports:
       - '9000:9000'

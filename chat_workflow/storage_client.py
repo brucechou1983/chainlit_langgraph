@@ -25,6 +25,20 @@ class MinIOStorageClient(BaseStorageClient):
                 aws_access_key_id=access_key,
                 aws_secret_access_key=secret_key,
             )
+            response = self.client.list_buckets()
+            existing_buckets = [bucket['Name']
+                                for bucket in response['Buckets']]
+            logger.info(
+                f"Successfully connected. Available buckets: {existing_buckets}")
+
+            if self.bucket not in existing_buckets:
+                logger.info(
+                    f"Bucket '{self.bucket}' does not exist. Creating it now.")
+                self.client.create_bucket(Bucket=self.bucket)
+                logger.info(f"Bucket '{self.bucket}' created successfully.")
+            else:
+                logger.info(f"Bucket '{self.bucket}' already exists.")
+
             logger.info("MinIOStorageClient initialized")
         except Exception as e:
             logger.warning(f"MinIOStorageClient initialization error: {e}")
@@ -44,7 +58,6 @@ class MinIOStorageClient(BaseStorageClient):
                 md5_hash = hashlib.md5(data if isinstance(
                     data, bytes) else data.encode('utf-8')).digest()
                 extra_args["ContentMD5"] = md5_hash
-
             self.client.put_object(
                 Bucket=self.bucket, Key=object_key, Body=data, **extra_args
             )

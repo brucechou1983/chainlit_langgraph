@@ -34,12 +34,13 @@ logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
 
 pg_url = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}"
 
+
 # Persistance Layer
 storage_client = MinIOStorageClient(
-    bucket=os.getenv("MINIO_BUCKET", "chainlit_langgraph"),
-    endpoint_url=os.getenv("MINIO_ENDPOINT_URL", "http://localhost:9000"),
-    access_key=os.getenv("MINIO_ACCESS_KEY", "chainlit_langgraph"),
-    secret_key=os.getenv("MINIO_SECRET_KEY", "chainlit_langgraph"),
+    bucket=os.getenv("MINIO_BUCKET", "mybucket"),
+    endpoint_url=os.getenv("MINIO_ENDPOINT_URL", "http://minio:9000"),
+    access_key=os.getenv("MINIO_ROOT_USER", "chainlit_langgraph"),
+    secret_key=os.getenv("MINIO_ROOT_PASSWORD", "chainlit_langgraph"),
 )
 cl_data._data_layer = SQLAlchemyDataLayer(
     conninfo=pg_url,

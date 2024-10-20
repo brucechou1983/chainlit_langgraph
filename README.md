@@ -6,6 +6,28 @@ Build your AI agent chatbot applications with this powerful integration of **Cha
 ## **Overview**
 This repository provides a demo showcasing the integration between Chainlit and Langgraph, designed to facilitate seamless communication between systems using state-of-the-art language models. Whether you're working with conversational AI or need a robust language model for text-based tasks, this project helps streamline the process with support for multiple LLMs.
 
+## **Workflows**
+
+This project includes several pre-built workflows to demonstrate the capabilities of the Chainlit Langgraph integration:
+
+### Simple Chat
+Located in `simple_chat.py`, this workflow provides a basic chatbot experience:
+- Utilizes a state graph with chat and tool nodes
+- Supports multiple language models
+- Includes basic tools like datetime and web search
+
+### Resume Optimizer
+Found in `resume_optimizer.py`, this workflow helps users improve their resumes:
+- Features a resume extractor node to process uploaded PDF resumes
+- Provides detailed analysis and suggestions for resume improvement
+
+### Lean Canvas Chat
+Implemented in `lean_canvas_chat.py`, this workflow assists in business modeling:
+- Guides users through the Lean Canvas creation process
+- Offers a structured approach to defining business models
+
+Each workflow demonstrates different aspects of the Chainlit Langgraph integration, showcasing its flexibility and power in creating AI-driven applications.
+
 ## **Features**
 - **Chainlit**: A powerful tool for creating interactive interfaces for AI models.
 - **LangGraph**: Enables the creation of complex language agentic workflows.
@@ -16,6 +38,8 @@ This repository provides a demo showcasing the integration between Chainlit and 
 - **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
 - **Search Engine**: Search for information from the web.
 - Easy-to-follow setup with **Poetry** for dependency management.
+
+
 
 ## Upcoming Features
 - **Image Input**: User can upload images and interact with them.

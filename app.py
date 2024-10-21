@@ -82,8 +82,6 @@ async def on_chat_end():
     except Exception as e:
         logger.error(f"Error saving LangGraph: {str(e)}")
 
-# FIXME
-
 
 @cl.on_chat_resume
 async def on_chat_resume(thread: ThreadDict):

@@ -153,6 +153,12 @@ Based on the above guidelines, please provide a detailed and specific modificati
             name=self.name,
             markdown_description="An assistant that helps users optimize their resumes.",
             icon="https://picsum.photos/152",
+            starters=[
+                cl.Starter(
+                    label="Help me analyze my resume.",
+                    message="Help me analyze my resume.",
+                ),
+            ],
         )
 
     @property

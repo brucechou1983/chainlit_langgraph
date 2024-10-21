@@ -67,11 +67,20 @@ class SimpleChatWorkflow(BaseWorkflow):
             markdown_description="A ChatGPT-like chatbot.",
             icon="https://picsum.photos/150",
             default=True,
-            # starters=[
-            #     cl.Starter(
-            #         label="Programming",
-            #         message="Write a snake game in Python.",
-            #     ),
+            starters=[
+                cl.Starter(
+                    label="Write a snake game in Python.",
+                    message="Write a snake game in Python.",
+                ),
+                cl.Starter(
+                    label="What is the weather in San Francisco?",
+                    message="What is the weather in San Francisco?",
+                ),
+                cl.Starter(
+                    label="How do I make a peanut butter and jelly sandwich?",
+                    message="How do I make a peanut butter and jelly sandwich?",
+                ),
+            ],
         )
 
     @property

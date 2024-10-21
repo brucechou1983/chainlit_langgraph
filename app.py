@@ -14,6 +14,7 @@ from chainlit.types import ThreadDict
 from chat_workflow.module_discovery import discover_modules
 from chat_workflow.storage_client import MinIOStorageClient, LangGraph, Thread
 from chat_workflow.state_serializer import StateSerializer
+from chat_workflow.auth import maybe_oauth_callback
 from dotenv import load_dotenv
 from typing import Dict, Optional
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -133,7 +134,7 @@ async def start_langgraph(chat_profile: str, state: Optional[Dict] = None):
         await update_state_by_settings(await workflow.get_chat_settings())
 
 
-@cl.oauth_callback
+@maybe_oauth_callback
 def oauth_callback(
     provider_id: str,
     token: str,

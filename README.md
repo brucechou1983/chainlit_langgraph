@@ -1,15 +1,13 @@
-# **Chainlit LangGraph Integration**
+# **Chainlit LangGraph Chatbot**
 
-[![Chainlit](https://img.shields.io/badge/Chainlit-Latest-brightgreen)](https://github.com/Chainlit/chainlit)
-[![LangGraph](https://img.shields.io/badge/LangGraph-Latest-brightgreen)](https://github.com/langchain-ai/langgraph)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-
+[![Chainlit](https://img.shields.io/badge/Chainlit-1.3.0rc1-brightgreen)](https://github.com/Chainlit/chainlit)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.2.39-brightgreen)](https://github.com/langchain-ai/langgraph)[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 Rapidly build and deploy production-ready conversational AI agents using Chainlit and LangGraph. This powerful integration combines state-of-the-art language models with flexible workflow management, enabling developers to create sophisticated chatbots, virtual assistants, and interactive AI applications in minutes.
 
 ![Demo](./resource/screenshot.gif)
 
 ## Table of Contents
-- [**Chainlit LangGraph Integration**](#chainlit-langgraph-integration)
+- [**Chainlit LangGraph Chatbot**](#chainlit-langgraph-chatbot)
   - [Table of Contents](#table-of-contents)
   - [**Why This Project?**](#why-this-project)
   - [**Features**](#features)
@@ -45,9 +43,9 @@ cp .env.example .env
 ```
 
 4. Edit the `.env` file and set the required variables, including:
-
-  - API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, TAVILY_API_KEY)
-  - DB volume settings (POSTGRES_VOLUME_PATH, MINIO_VOLUME_PATH): create mount folders on your host machine and set the paths accordingly.
+  - **API keys** (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`): Optional if you use **Ollama**.
+  - **DB volume settings** (`POSTGRES_VOLUME_PATH`, `MINIO_VOLUME_PATH`): create mount folders on your host machine and set the paths accordingly.
+  - (Optional) `TAVILY_API_KEY` for enabling search
   - (Optional) Google OAuth
   - (Optional) LangSmith
 

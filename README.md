@@ -47,7 +47,7 @@ cp .env.example .env
 4. Edit the `.env` file and set the required variables, including:
 
   - API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, TAVILY_API_KEY)
-  - DB volume settings (POSTGRES_VOLUME_PATH, MINIO_VOLUME_PATH)
+  - DB volume settings (POSTGRES_VOLUME_PATH, MINIO_VOLUME_PATH): create mount folders on your host machine and set the paths accordingly.
   - (Optional) Google OAuth
   - (Optional) LangSmith
 
@@ -58,6 +58,8 @@ docker compose up
 ```
 
 This will start all the necessary services, including the Chainlit application, PostgreSQL database, and MinIO object storage.
+
+6. The application should now be running at http://localhost:8000. Log in with the default username and password (admin:admin). You can change the default credentials in the `.env` file.
 
 ### Setting up Ollama (Optional)
 

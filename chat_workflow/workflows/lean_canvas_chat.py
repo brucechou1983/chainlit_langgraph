@@ -55,11 +55,12 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
         return cl.ChatProfile(
             name=self.name,
             markdown_description="A Business Modeling Assistant",
-            icon="https://picsum.photos/151",
+            icon="https://cdn2.iconfinder.com/data/icons/business-model-vol-1/128/business_model_canvas-business_model-business-plan-strategy-canvas-startup-3d.png",
             starters=[
                 cl.Starter(
                     label="Let's get started!",
                     message="Let's get started!",
+                    icon="https://cdn1.iconfinder.com/data/icons/3d-front-color/128/thumb-up-front-color.png",
                 ),
             ],
         )

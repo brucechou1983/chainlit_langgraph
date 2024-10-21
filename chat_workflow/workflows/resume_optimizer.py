@@ -152,11 +152,12 @@ Based on the above guidelines, please provide a detailed and specific modificati
         return cl.ChatProfile(
             name=self.name,
             markdown_description="An assistant that helps users optimize their resumes.",
-            icon="https://picsum.photos/152",
+            icon="https://cdn2.iconfinder.com/data/icons/3d-resume/128/5_Experience.png",
             starters=[
                 cl.Starter(
                     label="Help me analyze my resume.",
                     message="Help me analyze my resume.",
+                    icon="https://cdn0.iconfinder.com/data/icons/3d-graphic-design-tools-1/128/Zoom_In.png",
                 ),
             ],
         )
@@ -168,6 +169,6 @@ Based on the above guidelines, please provide a detailed and specific modificati
                 id="chat_model",
                 label="Chat Model",
                 values=sorted(list_available_llm()),
-                initial_index=1,
+                initial_index=0,
             ),
         ])

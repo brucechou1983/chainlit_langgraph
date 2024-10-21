@@ -65,20 +65,23 @@ class SimpleChatWorkflow(BaseWorkflow):
         return cl.ChatProfile(
             name=self.name,
             markdown_description="A ChatGPT-like chatbot.",
-            icon="https://picsum.photos/150",
+            icon="https://cdn1.iconfinder.com/data/icons/3d-front-color/128/chat-text-front-color.png",
             default=True,
             starters=[
                 cl.Starter(
                     label="Write a snake game in Python.",
                     message="Write a snake game in Python.",
+                    icon="https://cdn1.iconfinder.com/data/icons/photography-calendar-speaker-person-thinking-3d-il/128/13.png",
                 ),
                 cl.Starter(
                     label="What is the weather in San Francisco?",
                     message="What is the weather in San Francisco?",
+                    icon="https://cdn0.iconfinder.com/data/icons/3d-dynamic-color/128/sun-dynamic-color.png",
                 ),
                 cl.Starter(
                     label="How do I make a peanut butter and jelly sandwich?",
                     message="How do I make a peanut butter and jelly sandwich?",
+                    icon="https://cdn0.iconfinder.com/data/icons/fast-food-3d/128/Sandwich.png",
                 ),
             ],
         )

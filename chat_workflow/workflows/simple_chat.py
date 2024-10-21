@@ -7,7 +7,7 @@ from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
 from ..llm import create_chat_model, list_available_llm
 from ..tools import BasicToolNode
-from ..tools.search import search
+from ..tools.search import get_search_tools
 from ..tools.time import get_datetime_now
 
 
@@ -20,8 +20,7 @@ class SimpleChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
 
-        # TODO: check tool availability
-        self.tools = [get_datetime_now, search]
+        self.tools = [get_datetime_now] + get_search_tools()
 
     def create_graph(self) -> StateGraph:
         graph = StateGraph(GraphState)

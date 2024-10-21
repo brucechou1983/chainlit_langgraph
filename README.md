@@ -1,52 +1,39 @@
-# **Chainlit Langgraph Integration**  
-Build your AI agent chatbot applications with this powerful integration of **Chainlit** and **LangGraph**.
+# **Chainlit LangGraph Integration**
+
+[![Chainlit](https://img.shields.io/badge/Chainlit-Latest-brightgreen)](https://github.com/Chainlit/chainlit)
+[![LangGraph](https://img.shields.io/badge/LangGraph-Latest-brightgreen)](https://github.com/langchain-ai/langgraph)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+Rapidly build and deploy production-ready conversational AI agents using Chainlit and LangGraph. This powerful integration combines state-of-the-art language models with flexible workflow management, enabling developers to create sophisticated chatbots, virtual assistants, and interactive AI applications in minutes.
 
 ![Demo](./public/screenshot.gif)
 
-## **Overview**
-This repository provides a demo showcasing the integration between Chainlit and Langgraph, designed to facilitate seamless communication between systems using state-of-the-art language models. Whether you're working with conversational AI or need a robust language model for text-based tasks, this project helps streamline the process with support for multiple LLMs.
+## Table of Contents
+- [**Chainlit LangGraph Integration**](#chainlit-langgraph-integration)
+  - [Table of Contents](#table-of-contents)
+  - [**Why This Project?**](#why-this-project)
+  - [**Features**](#features)
+  - [**Getting Started**](#getting-started)
+    - [Setting up Ollama (Optional)](#setting-up-ollama-optional)
+  - [**Workflows**](#workflows)
+    - [Simple Chat Workflow](#simple-chat-workflow)
+    - [Resume Optimizer](#resume-optimizer)
+    - [Lean Canvas Chat](#lean-canvas-chat)
+    - [**Creating Your Own Workflow**](#creating-your-own-workflow)
+  - [Upcoming Features](#upcoming-features)
 
-## **Workflows**
-
-This project includes several pre-built workflows to demonstrate the capabilities of the Chainlit Langgraph integration:
-
-### Simple Chat
-Located in `simple_chat.py`, this workflow provides a basic chatbot experience:
-- Utilizes a state graph with chat and tool nodes
-- Supports multiple language models
-- Includes basic tools like datetime and web search
-
-### Resume Optimizer
-Found in `resume_optimizer.py`, this workflow helps users improve their resumes:
-- Features a resume extractor node to process uploaded PDF resumes
-- Provides detailed analysis and suggestions for resume improvement
-
-### Lean Canvas Chat
-Implemented in `lean_canvas_chat.py`, this workflow assists in business modeling:
-- Guides users through the Lean Canvas creation process
-- Offers a structured approach to defining business models
-
-Each workflow demonstrates different aspects of the Chainlit Langgraph integration, showcasing its flexibility and power in creating AI-driven applications.
+## **Why This Project?**
+[Chainlit](https://github.com/Chainlit/chainlit) is a powerful tool for building production-ready conversational AI applications. [LangGraph](https://github.com/langchain-ai/langgraph), on the other hand, is a versatile framework for building and managing state graphs in AI applications. This project combines these two to provide a comprehensive solution for building conversational AI agents, in minutes.
 
 ## **Features**
-- **Chainlit**: A powerful tool for creating interactive interfaces for AI models.
-- **LangGraph**: Enables the creation of complex language agentic workflows.
-- **Multiple LLM Support**: Automaatically detects and uses the following LLMs:
+- **Building Blocks**: Utilize a variety of building blocks to create your own conversational AI agents.
+- **Multiple LLM Support**: Automatically detects and uses the following LLMs:
   - **Ollama**: Open source model.
   - **Claude**: Advanced AI models by Anthropic.
   - **GPT**: Advanced AI models by OpenAI.
-- **Multi-Step Examples**: Explore a variety of use cases with multi-step examples.
-- **Search Engine**: Search for information from the web.
-- Easy-to-follow setup with **Poetry** for dependency management.
+- **Examples**: Explore a variety of use cases with conversational AI agents examples.
 
-
-
-## Upcoming Features
-- **Image Input**: User can upload images and interact with them.
-- **Image Generation**: Generate images based on user input.
-- **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
-
-## **Installation Guide**
+## **Getting Started**
 Follow these steps to set up and run the project using Docker Compose or in your Python 3.10 virtual environment.
 
 1. Make sure you have Docker and Docker Compose installed on your system.
@@ -57,7 +44,7 @@ Follow these steps to set up and run the project using Docker Compose or in your
 cp .env.example .env
 ```
 
-4. Edit the .env file and set the required variables, including:
+4. Edit the `.env` file and set the required variables, including:
 
   - API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, TAVILY_API_KEY)
   - DB volume settings (POSTGRES_VOLUME_PATH, MINIO_VOLUME_PATH)
@@ -71,7 +58,6 @@ docker compose up
 ```
 
 This will start all the necessary services, including the Chainlit application, PostgreSQL database, and MinIO object storage.
-
 
 ### Setting up Ollama (Optional)
 
@@ -92,14 +78,33 @@ ollama run hf.co/{username}/{repository}:{quantization}
 ![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/ollama/guide.png)
 
 
-## **Creating Your Own Workflow**
+## **Workflows**
+This project includes several pre-built workflows to demonstrate the capabilities of the Chainlit Langgraph integration:
+
+### [Simple Chat Workflow](./chat_workflow/workflows/simple_chat.py)
+Located in `simple_chat.py`, this workflow provides a basic chatbot experience:
+- Utilizes a state graph with chat and tool nodes
+- Supports multiple language models
+- Includes basic tools like datetime and web search
+
+### [Resume Optimizer](./chat_workflow/workflows/resume_optimizer.py)
+Found in `resume_optimizer.py`, this workflow helps users improve their resumes:
+- Features a resume extractor node to process uploaded PDF resumes
+- Provides detailed analysis and suggestions for resume improvement
+
+### [Lean Canvas Chat](./chat_workflow/workflows/lean_canvas_chat.py)
+Implemented in `lean_canvas_chat.py`, this workflow assists in business modeling:
+- Guides users through the Lean Canvas creation process
+- Offers a structured approach to defining business models
+
+Each workflow demonstrates different aspects of the Chainlit Langgraph integration, showcasing its flexibility and power in creating AI-driven applications.
+
+### **Creating Your Own Workflow**
 - Inherit from the `BaseWorkflow` and `BaseState` classes. For more details, refer to the [Simple Chat Workflow](./chat_workflow/workflows/simple_chat.py) example.
 - Place your workflow in the `chat_workflow/workflows` module.
 
-## **Usage Examples**
-- **Conversational AI**: Utilize Chainlit to create conversational interfaces that can be integrated into websites or apps.
-- **Text Processing**: Leverage advanced natural language understanding for tasks like summarization, translation, or Q&A.
-
-## **Additional Resources**
-- [Chainlit Documentation](https://docs.chainlit.io/get-started/overview)
-- [Langgraph Documentation](https://langchain-ai.github.io/langgraph/)
+## Upcoming Features
+- **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.
+- **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
+- **Image Input**: User can upload images and interact with them.
+- **Image Generation**: Generate images based on user input.

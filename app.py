@@ -69,7 +69,7 @@ async def on_chat_end():
                 state=StateSerializer.serialize(state),
                 workflow=workflow_name,
             ).on_conflict_do_update(
-                # This upsert is necessary because we might have created the thread in the on_chat_start.
+                # The upsert operation
                 index_elements=['thread_id'],
                 set_=dict(
                     state=StateSerializer.serialize(state),
@@ -166,19 +166,6 @@ async def chat_profile():
 
 @cl.on_chat_start
 async def on_chat_start():
-    engine = create_async_engine(pg_url)
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False)
-
-    # Ensure Thread exists
-    # This is a workaround for the fact that sometimes the thread is not created. Should be a bug in chainlit.
-    async with async_session() as session:
-        thread = await session.get(Thread, cl.context.session.thread_id)
-        if not thread:
-            thread = Thread(id=cl.context.session.thread_id)
-            session.add(thread)
-            await session.commit()
-
     await start_langgraph(cl.context.session.chat_profile)
     logger.info("Chat started and initialized")
 

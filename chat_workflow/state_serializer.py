@@ -1,6 +1,6 @@
 import json
 from typing import Type
-from langchain_core.messages import HumanMessage, AIMessage, ToolMessage, SystemMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, SystemMessage, ToolMessage
 from chat_workflow.workflows.base import BaseState
 
 
@@ -19,48 +19,6 @@ class StateSerializer:
 
         deserialize(serialized_state: str, state_class: Type[BaseState]) -> BaseState:
             Converts a JSON string back to a BaseState object of the specified class.
-
-    Static Methods:
-        _serialize_messages(messages: List) -> List[Dict]:
-            Converts message objects to serializable dictionaries.
-
-        _deserialize_messages(serialized_messages: List[Dict]) -> List:
-            Converts serialized message dictionaries back to message objects.
-
-        _json_serializer(obj: Any) -> Any:
-            Custom JSON serializer for handling complex objects.
-
-        _json_deserializer(dct: Dict) -> Dict:
-            Custom JSON deserializer for handling serialized complex objects.
-
-    This class can be inherited and extended to handle custom state types
-    or to add specific serialization/deserialization logic for new attributes.
-
-    Example:
-        class CustomStateSerializer(StateSerializer):
-            @classmethod
-            def serialize(cls, state: CustomState) -> str:
-                # Add custom serialization logic here
-                serializable_state = state.copy()
-
-                # Example: Convert a custom attribute to a string
-                if 'custom_attribute' in serializable_state:
-                    serializable_state['custom_attribute'] = str(serializable_state['custom_attribute'])
-
-                # Call the parent class's serialize method
-                return super().serialize(serializable_state)
-
-            @classmethod
-            def deserialize(cls, serialized_state: str) -> CustomState:
-                # Call the parent class's deserialize method
-                state_dict = json.loads(serialized_state)
-
-                # Add custom deserialization logic here
-                # Example: Convert the custom attribute back to its original type
-                if 'custom_attribute' in state_dict:
-                    state_dict['custom_attribute'] = CustomType(state_dict['custom_attribute'])
-
-                return CustomState(**cls._json_deserializer(state_dict))
     """
 
     @classmethod
@@ -79,26 +37,45 @@ class StateSerializer:
 
     @staticmethod
     def _serialize_messages(messages):
-        serialized_messages = []
-        for msg in messages:
-            if isinstance(msg, (HumanMessage, AIMessage, ToolMessage, SystemMessage)):
-                serialized_messages.append({
-                    "role": msg.__class__.__name__.lower().replace("message", ""),
-                    "content": msg.content
-                })
-            else:
-                raise ValueError(f"Unsupported message type: {type(msg)}")
-        return serialized_messages
+        return [message.model_dump() for message in messages]
 
     @staticmethod
     def _deserialize_messages(serialized_messages):
-        message_types = {
+        """
+        Deserialize a list of message dictionaries into their respective BaseMessage subclasses.
+
+        This method takes a list of serialized message dictionaries and converts them back
+        into instances of the appropriate BaseMessage subclasses (HumanMessage, AIMessage,
+        ToolMessage, SystemMessage) based on the 'type' field in each dictionary.
+
+        Args:
+            serialized_messages (List[Dict]): A list of dictionaries representing serialized messages.
+                Each dictionary should contain a 'type' field and other relevant message data.
+
+        Returns:
+            List[BaseMessage]: A list of deserialized BaseMessage subclass instances.
+
+        Example:
+            serialized_messages = [
+                {"type": "human", "content": "Hello"},
+                {"type": "ai", "content": "Hi there!"},
+                {"type": "tool", "content": "Processing...", "tool_call_id": "123"}
+            ]
+            deserialized_messages = StateSerializer._deserialize_messages(serialized_messages)
+        """
+        message_type_mapping = {
             "human": HumanMessage,
             "ai": AIMessage,
             "tool": ToolMessage,
-            "system": SystemMessage
+            "system": SystemMessage,
         }
-        return [message_types[msg['role']](content=msg['content']) for msg in serialized_messages]
+
+        deserialized_messages = []
+        for msg_dict in serialized_messages:
+            msg_type = msg_dict.get("type")
+            msg_class = message_type_mapping.get(msg_type, BaseMessage)
+            deserialized_messages.append(msg_class.model_validate(msg_dict))
+        return deserialized_messages
 
     @staticmethod
     def _json_serializer(obj):

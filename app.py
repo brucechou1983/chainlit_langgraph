@@ -212,9 +212,8 @@ async def on_message(message: cl.Message):
         f"Updated state with new message. Total messages: {len(state['messages'])}")
 
     ui_message = None
-    total_content: str = ""
     logger.info("Starting to stream response")
-    async for event in graph.astream_events(state, version="v1"):
+    async for event in graph.astream_events(state, version="v1", stream_mode="values"):
         string_content = ""
         if event["event"] == "on_chat_model_stream" and event["name"] == workflow.output_chat_model:
             content = event["data"]["chunk"].content or ""
@@ -227,18 +226,15 @@ async def on_message(message: cl.Message):
                     string_content += " ".join([c["text"] for c in content])
             else:
                 string_content = ""
-            total_content += string_content
             if ui_message is None:
                 ui_message = cl.Message(content=string_content)
                 await ui_message.send()
                 logger.debug("Started new UI message")
             else:
                 await ui_message.stream_token(token=string_content)
+        if event["event"] == "on_chain_end" and event["name"] == "LangGraph":
+            state = event["data"]["output"]
     await ui_message.update()
-    logger.info(
-        f"Finished streaming response. Total length: {len(total_content)}")
-
-    state["messages"] += [AIMessage(content=total_content)]
     cl.user_session.set("state", state)
     logger.debug(
         f"Updated state with AI response. Total messages: {len(state['messages'])}")

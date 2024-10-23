@@ -3,10 +3,9 @@ from chainlit import logger
 from pypdf import PdfReader
 from chainlit.input_widget import Select
 from langgraph.graph import StateGraph, END
-from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
-from typing import Sequence
 from .base import BaseWorkflow, BaseState
 from ..llm import create_chat_model, list_available_llm
 # from ..tools import BasicToolNode

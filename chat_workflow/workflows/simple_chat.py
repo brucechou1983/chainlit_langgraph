@@ -1,6 +1,6 @@
 import chainlit as cl
 from chainlit.input_widget import Select
-from langgraph.graph import StateGraph, END
+from langgraph.graph import StateGraph
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig

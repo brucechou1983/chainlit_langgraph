@@ -11,6 +11,7 @@ class BaseState(TypedDict):
     # Message history
     messages: Annotated[Sequence[AnyMessage], operator.add]
 
+    # Name of the workflow
     chat_profile: str
 
 

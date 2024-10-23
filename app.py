@@ -33,10 +33,6 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
 # Discovery workflow dynamically
 discover_workflows()
-# registered_workflows = {
-#     name: WorkflowFactory.create(name)
-#     for name in WorkflowFactory.list_workflows()
-# }
 
 pg_url = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}"
 

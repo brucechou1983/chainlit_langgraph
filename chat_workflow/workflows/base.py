@@ -28,6 +28,7 @@ class BaseWorkflow(ABC):
         """
 
     @classmethod
+    @abstractmethod
     def name(cls) -> str:
         pass
 

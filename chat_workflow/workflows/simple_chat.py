@@ -47,23 +47,23 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     def create_default_state(self) -> GraphState:
         return {
-            "name": self.name,
+            "name": self.name(),
             "messages": [],
             "chat_model": "",
         }
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         return "Simple Chat"
 
     @property
     def output_chat_model(self) -> str:
         return "chat_model"
 
-    @property
-    def chat_profile(self) -> cl.ChatProfile:
+    @classmethod
+    def chat_profile(cls) -> cl.ChatProfile:
         return cl.ChatProfile(
-            name=self.name,
+            name=cls.name(),
             markdown_description="A ChatGPT-like chatbot.",
             icon="https://cdn1.iconfinder.com/data/icons/3d-front-color/128/chat-text-front-color.png",
             default=True,

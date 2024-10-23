@@ -33,11 +33,10 @@ logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
 # Discovery workflow dynamically
 discover_workflows()
-registered_workflows = {
-    name: WorkflowFactory.create(name)
-    for name in WorkflowFactory.list_workflows()
-}
-logger.debug(f"Discovered workflows: {list(registered_workflows.keys())}")
+# registered_workflows = {
+#     name: WorkflowFactory.create(name)
+#     for name in WorkflowFactory.list_workflows()
+# }
 
 pg_url = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}"
 
@@ -102,10 +101,7 @@ async def on_chat_resume(thread: ThreadDict):
         db_graph = await session.get(LangGraph, thread["id"])
         if db_graph:
             chat_profile = db_graph.workflow
-            workflow = registered_workflows[chat_profile]
-            workflow_module = workflow.__class__.__module__
-            GraphState = getattr(importlib.import_module(
-                workflow_module), "GraphState")
+            GraphState = WorkflowFactory.get_graph_state(chat_profile)
             state = StateSerializer.deserialize(db_graph.state, GraphState)
             cl.user_session.set("state", state)
 
@@ -122,7 +118,7 @@ async def start_langgraph(chat_profile: str, state: Optional[Dict] = None):
         chat_profile (str): The name of the chat profile to load.
         state (Optional[Dict]): The state to load.
     """
-    workflow = registered_workflows[chat_profile]
+    workflow = WorkflowFactory.create(name=chat_profile)
     graph = workflow.create_graph()
     cl.user_session.set("graph", graph.compile())
     if state:
@@ -164,8 +160,8 @@ def auth_callback(username: str, password: str):
 @cl.set_chat_profiles
 async def chat_profile():
     profiles = []
-    for workflow in registered_workflows.values():
-        profiles.append(workflow.chat_profile)
+    for name in WorkflowFactory.list_workflows():
+        profiles.append(WorkflowFactory.get_chat_profile(name))
     logger.debug(f"Chat profiles created: {len(profiles)}")
     return profiles
 
@@ -210,7 +206,7 @@ async def on_message(message: cl.Message):
 
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
-    workflow = registered_workflows[state["chat_profile"]]
+    workflow = WorkflowFactory.create(name=state["chat_profile"])
     logger.debug(f"Chat Profile: {chat_profile}")
 
     state["messages"] += [HumanMessage(content=message.content)]

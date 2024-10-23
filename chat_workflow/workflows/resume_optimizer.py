@@ -132,24 +132,24 @@ Based on the above guidelines, please provide a detailed and specific modificati
 
     def create_default_state(self) -> GraphState:
         return {
-            "name": self.name,
+            "name": self.name(),
             "messages": [],
             "chat_model": "",
             "resume_text": "",
         }
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         return "Resume Optimizer"
 
     @property
     def output_chat_model(self) -> str:
         return "chat_model"
 
-    @property
-    def chat_profile(self) -> cl.ChatProfile:
+    @classmethod
+    def chat_profile(cls):
         return cl.ChatProfile(
-            name=self.name,
+            name=cls.name(),
             markdown_description="An assistant that helps users optimize their resumes.",
             icon="https://cdn2.iconfinder.com/data/icons/3d-resume/128/5_Experience.png",
             starters=[

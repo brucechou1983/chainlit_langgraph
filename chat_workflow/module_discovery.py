@@ -14,5 +14,4 @@ def discover_workflows():
             for attr_name in dir(module):
                 attr = getattr(module, attr_name)
                 if isinstance(attr, type) and issubclass(attr, BaseWorkflow) and attr != BaseWorkflow:
-                    # Register discovered workflow with factory
-                    WorkflowFactory.register(attr().name, attr)
+                    WorkflowFactory.register(attr.name(), attr)

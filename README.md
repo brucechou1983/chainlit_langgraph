@@ -13,11 +13,11 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
   - [**Features**](#features)
   - [**Getting Started**](#getting-started)
     - [Setting up Ollama (Optional)](#setting-up-ollama-optional)
+  - [**Creating Custom Workflow**](#creating-custom-workflow)
   - [**Workflows**](#workflows)
     - [Simple Chat Workflow](#simple-chat-workflow)
     - [Resume Optimizer](#resume-optimizer)
     - [Lean Canvas Chat](#lean-canvas-chat)
-    - [**Creating Your Own Workflow**](#creating-your-own-workflow)
   - [Upcoming Features](#upcoming-features)
 
 ## **Why This Project?**
@@ -77,6 +77,49 @@ ollama run hf.co/{username}/{repository}:{quantization}
 
 ![](https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/ollama/guide.png)
 
+## **Creating Custom Workflow**
+Creating your own custom workflow allows you to tailor the application to your specific needs. Follow the step-by-step guide below to create your own workflow.
+
+1. Go to the `chat_workflow/workflows` directory in your project, and create a new Python file for your workflow, e.g., `my_custom_workflow.py`.
+2. Define Your State Class
+  - Inherit from `BaseState` to define the state variables your workflow will use. For example:
+  ```python
+  class MyCustomState(BaseState):
+    # Model name of the chatbot
+    chat_model: str
+    # Add other state variables as needed
+  ```
+3. Define Your Workflow
+  - Inherit from `BaseWorkflow` to define your custom workflow logic, and override the `create_graph` method to define the state graph.
+  ```python
+  class MyCustomWorkflow(BaseWorkflow):
+    def create_graph(self) -> StateGraph:
+        # LangGraph graph definition
+        graph = StateGraph(MyCustomState)
+        # Add nodes to the graph
+        graph.add_node("chat", self.chat_node)
+        # Add edges between nodes
+        graph.add_edge("chat", END)
+        # Set the entry point of the graph
+        graph.set_entry_point("chat")
+        return graph
+  ```
+  - Define node methods like `self.chat_node` in the `create_graph` method.
+  - Define default state by overriding the `get_default_state` method.
+  ```python
+  def create_default_state(self) -> MyCustomState:
+    return {
+        "name": self.name(),
+        "messages": [],
+        "chat_model": "",
+        # Initialize other state variables if needed
+    }
+  ```
+  - Set workflow properties.
+    - name: The display name of the workflow. For example, "My Custom Workflow".
+    - output_chat_model: The name of the LLM model to provide final output as a response.
+    - chat_profile: The profile for the workflow.
+    - starter: The starter message for the workflow.
 
 ## **Workflows**
 This project includes several pre-built workflows to demonstrate the capabilities of the Chainlit Langgraph integration:
@@ -99,9 +142,6 @@ Implemented in `lean_canvas_chat.py`, this workflow assists in business modeling
 
 Each workflow demonstrates different aspects of the Chainlit Langgraph integration, showcasing its flexibility and power in creating AI-driven applications.
 
-### **Creating Your Own Workflow**
-- Inherit from the `BaseWorkflow` and `BaseState` classes. For more details, refer to the [Simple Chat Workflow](./chat_workflow/workflows/simple_chat.py) example.
-- Place your workflow in the `chat_workflow/workflows` module.
 
 ## Upcoming Features
 - **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.

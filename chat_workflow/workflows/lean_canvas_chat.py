@@ -37,23 +37,23 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
 
     def create_default_state(self) -> GraphState:
         return {
-            "name": self.name,
+            "name": self.name(),
             "messages": [],
             "chat_model": "",
         }
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         return "Lean Canvas Chat"
 
     @property
     def output_chat_model(self) -> str:
         return "chat_model"
 
-    @property
-    def chat_profile(self) -> cl.ChatProfile:
+    @classmethod
+    def chat_profile(cls) -> cl.ChatProfile:
         return cl.ChatProfile(
-            name=self.name,
+            name=cls.name(),
             markdown_description="A Business Modeling Assistant",
             icon="https://cdn2.iconfinder.com/data/icons/business-model-vol-1/128/business_model_canvas-business_model-business-plan-strategy-canvas-startup-3d.png",
             starters=[

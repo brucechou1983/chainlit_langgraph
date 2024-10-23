@@ -3,10 +3,9 @@ from chainlit import logger
 from pypdf import PdfReader
 from chainlit.input_widget import Select
 from langgraph.graph import StateGraph, END
-from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
-from typing import Sequence
 from .base import BaseWorkflow, BaseState
 from ..llm import create_chat_model, list_available_llm
 # from ..tools import BasicToolNode
@@ -133,24 +132,24 @@ Based on the above guidelines, please provide a detailed and specific modificati
 
     def create_default_state(self) -> GraphState:
         return {
-            "name": self.name,
+            "name": self.name(),
             "messages": [],
             "chat_model": "",
             "resume_text": "",
         }
 
-    @property
-    def name(self) -> str:
+    @classmethod
+    def name(cls) -> str:
         return "Resume Optimizer"
 
     @property
     def output_chat_model(self) -> str:
         return "chat_model"
 
-    @property
-    def chat_profile(self) -> cl.ChatProfile:
+    @classmethod
+    def chat_profile(cls):
         return cl.ChatProfile(
-            name=self.name,
+            name=cls.name(),
             markdown_description="An assistant that helps users optimize their resumes.",
             icon="https://cdn2.iconfinder.com/data/icons/3d-resume/128/5_Experience.png",
             starters=[

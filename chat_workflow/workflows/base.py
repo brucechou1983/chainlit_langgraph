@@ -11,6 +11,7 @@ class BaseState(TypedDict):
     # Message history
     messages: Annotated[Sequence[AnyMessage], operator.add]
 
+    # Name of the workflow
     chat_profile: str
 
 
@@ -27,9 +28,9 @@ class BaseWorkflow(ABC):
         Define the default state of the workflow.
         """
 
-    @property
+    @classmethod
     @abstractmethod
-    def name(self) -> str:
+    def name(cls) -> str:
         pass
 
     @property
@@ -41,9 +42,9 @@ class BaseWorkflow(ABC):
         used to generate the final output.
         """
 
-    @property
+    @classmethod
     @abstractmethod
-    def chat_profile(self) -> cl.ChatProfile:
+    def chat_profile(cls) -> cl.ChatProfile:
         """
         Chat profile to display in the UI. This is for providing
         an option in the list of available workflows to the user.

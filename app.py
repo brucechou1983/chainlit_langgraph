@@ -6,15 +6,16 @@ import chainlit.data as cl_data
 import logging
 import os
 import importlib
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage
 from langchain_core.runnables import Runnable
 from chainlit.data.sql_alchemy import SQLAlchemyDataLayer
 from chainlit.logger import logger
 from chainlit.types import ThreadDict
-from chat_workflow.module_discovery import discover_modules
+from chat_workflow.module_discovery import discover_workflows
 from chat_workflow.storage_client import MinIOStorageClient, LangGraph, Thread
 from chat_workflow.state_serializer import StateSerializer
 from chat_workflow.auth import maybe_oauth_callback
+from chat_workflow.workflows.workflow_factory import WorkflowFactory
 from dotenv import load_dotenv
 from typing import Dict, Optional
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -30,8 +31,8 @@ numeric_level = getattr(logging, logging_level, None)
 logger.setLevel(numeric_level)
 logger.info(f"Logging level set to: {logging_level} {numeric_level}")
 
-discovered_workflows = discover_modules()
-logger.debug(f"Discovered workflows: {list(discovered_workflows.keys())}")
+# Discovery workflow dynamically
+discover_workflows()
 
 pg_url = f"postgresql+asyncpg://{os.getenv('POSTGRES_USER', 'postgres')}:{os.getenv('POSTGRES_PASSWORD', 'postgres')}@{os.getenv('POSTGRES_HOST', 'localhost')}:{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'postgres')}"
 
@@ -96,10 +97,7 @@ async def on_chat_resume(thread: ThreadDict):
         db_graph = await session.get(LangGraph, thread["id"])
         if db_graph:
             chat_profile = db_graph.workflow
-            workflow = discovered_workflows[chat_profile]
-            workflow_module = workflow.__class__.__module__
-            GraphState = getattr(importlib.import_module(
-                workflow_module), "GraphState")
+            GraphState = WorkflowFactory.get_graph_state(chat_profile)
             state = StateSerializer.deserialize(db_graph.state, GraphState)
             cl.user_session.set("state", state)
 
@@ -116,7 +114,7 @@ async def start_langgraph(chat_profile: str, state: Optional[Dict] = None):
         chat_profile (str): The name of the chat profile to load.
         state (Optional[Dict]): The state to load.
     """
-    workflow = discovered_workflows[chat_profile]
+    workflow = WorkflowFactory.create(name=chat_profile)
     graph = workflow.create_graph()
     cl.user_session.set("graph", graph.compile())
     if state:
@@ -158,8 +156,8 @@ def auth_callback(username: str, password: str):
 @cl.set_chat_profiles
 async def chat_profile():
     profiles = []
-    for workflow in discovered_workflows.values():
-        profiles.append(workflow.chat_profile)
+    for name in WorkflowFactory.list_workflows():
+        profiles.append(WorkflowFactory.get_chat_profile(name))
     logger.debug(f"Chat profiles created: {len(profiles)}")
     return profiles
 
@@ -204,7 +202,7 @@ async def on_message(message: cl.Message):
 
     graph: Runnable = cl.user_session.get("graph")
     state = cl.user_session.get("state")
-    workflow = discovered_workflows[state["chat_profile"]]
+    workflow = WorkflowFactory.create(name=state["chat_profile"])
     logger.debug(f"Chat Profile: {chat_profile}")
 
     state["messages"] += [HumanMessage(content=message.content)]

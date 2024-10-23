@@ -2,10 +2,10 @@ import importlib
 import os
 from typing import Dict, Type
 from .workflows.base import BaseWorkflow
+from .workflows.workflow_factory import WorkflowFactory
 
 
-def discover_modules() -> Dict[str, Type[BaseWorkflow]]:
-    modules = {}
+def discover_workflows():
     workflows_dir = os.path.join(os.path.dirname(__file__), 'workflows')
     for filename in os.listdir(workflows_dir):
         if filename.endswith('.py') and not filename.startswith('__'):
@@ -15,6 +15,5 @@ def discover_modules() -> Dict[str, Type[BaseWorkflow]]:
             for attr_name in dir(module):
                 attr = getattr(module, attr_name)
                 if isinstance(attr, type) and issubclass(attr, BaseWorkflow) and attr != BaseWorkflow:
-                    workflow = attr()
-                    modules[workflow.name] = workflow
-    return modules
+                    # Register discovered workflow with factory
+                    WorkflowFactory.register(attr().name, attr)

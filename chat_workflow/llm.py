@@ -1,6 +1,8 @@
+from typing import Dict, Union, List
 import os
 import re
 import requests
+from chainlit import logger
 from dotenv import load_dotenv
 from openai import OpenAI
 from typing import Optional, List
@@ -12,16 +14,99 @@ from langchain_openai import ChatOpenAI
 load_dotenv()
 
 
+# Ollama parameter type definitions
+OLLAMA_INT_PARAMS = {
+    'mirostat', 'num_ctx', 'num_gpu', 'num_thread',
+    'num_predict', 'repeat_last_n', 'top_k', 'seed'
+}
+OLLAMA_FLOAT_PARAMS = {
+    'mirostat_eta', 'mirostat_tau', 'repeat_penalty',
+    'temperature', 'tfs_z', 'top_p'
+}
+OLLAMA_LIST_PARAMS = {'stop'}
+OLLAMA_STR_PARAMS = {
+    'format',  # Can be "" or "json"
+    'base_url',
+    'keep_alive',  # Can be int or str
+    'model'
+}
+
+
+def _parse_ollama_params(parameters: str) -> Dict[str, Union[int, float, List[str], str]]:
+    """
+    Parse the parameters from the Ollama API response
+
+    Args:
+        parameters: Raw parameter string from Ollama API
+
+    Returns:
+        Dict of parsed parameters with appropriate types
+
+    Example:
+        Input: 'num_ctx                        4096\nstop                           "[INST]"\nstop                           "[/INST]"'
+        Output: {
+            "num_ctx": 4096,
+            "stop": ["[INST]", "[/INST]"]
+        }
+    """
+    result = {}
+    if not parameters or not isinstance(parameters, str):
+        return result
+
+    for line in parameters.strip().split('\n'):
+        parts = line.strip().split(None, 1)
+        if len(parts) != 2:
+            continue
+
+        key, raw_value = parts
+        value = raw_value.strip('"\'')
+        if not value:
+            continue
+
+        try:
+            if key in OLLAMA_LIST_PARAMS:
+                if key not in result:
+                    result[key] = []
+                result[key].append(value)
+            elif key in OLLAMA_INT_PARAMS:
+                result[key] = int(value)
+            elif key in OLLAMA_FLOAT_PARAMS:
+                result[key] = float(value)
+            elif key in OLLAMA_STR_PARAMS:
+                # Special handling for keep_alive which can be int or str
+                if key == 'keep_alive':
+                    try:
+                        result[key] = int(value)
+                    except ValueError:
+                        result[key] = value
+                else:
+                    result[key] = value
+        except (ValueError, TypeError):
+            logger.debug(
+                f"Skipping invalid parameter value: {key}={raw_value}")
+            continue
+
+    return result
+
+
 def _create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
-    stop = None
-    if model in ["llama3, llama3.1, llama3.2", "llama3.2:3b-instruct-q8_0"]:
-        stop = [
-            "<|start_header_id|>",
-            "<|end_header_id|>",
-            "<|eot_id|>"
-        ]
-    return ChatOllama(name=name, model=model, stop=stop,
-                      base_url=os.getenv("OLLAMA_URL", "http://localhost:11434"), **kwargs)
+    # Fetch the model parameters from the Ollama API
+    base_url = os.getenv("OLLAMA_URL")
+    response = requests.post(
+        f"{base_url}/api/show", json={"name": model})
+    logger.debug(f"Response: {response}")
+    params_kwargs = {}
+    if response.status_code == 200:
+        response_json = response.json()
+        if "parameters" in response_json:
+            params_kwargs = _parse_ollama_params(response_json["parameters"])
+
+    # Merge the parameters from the Ollama API response with the provided kwargs
+    # When conflict, kwargs overrides
+    params_kwargs.update(kwargs)
+    logger.debug(f"Params kwargs: {params_kwargs}")
+    return ChatOllama(name=name, model=model,
+                      base_url=os.getenv("OLLAMA_URL", "http://localhost:11434"), **params_kwargs)
 
 
 def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:
@@ -29,12 +114,10 @@ def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwa
         llm = ChatAnthropic(name=name, model=model, **kwargs)
     elif re.match(r"^gpt-*", model):
         llm = ChatOpenAI(name=name, model=model, **kwargs)
-    elif match := re.match(r"^ollama-(.*)", model):
-        "ex: 'ollama-llama3.2' -> 'llama3.2'"
+    elif match := re.match(r"^\(ollama\)(.*)", model):
+        "ex: '(ollama)llama3.2' -> 'llama3.2'"
         model_name = match.group(1)
-        llm = _create_chat_ollama_model(name, model_name, **kwargs)
-    else:
-        raise ValueError(f"Unsupported chat model: {model}")
+        return _create_chat_ollama_model(name, model_name, **kwargs)
 
     if tools is None:
         return llm
@@ -86,7 +169,7 @@ def list_ollama_models(url: str = "http://localhost:11434") -> List[str]:
     try:
         response = requests.get(f"{url}/api/tags")
         response.raise_for_status()
-        return [f'ollama-{model["name"]}' for model in response.json()["models"]]
+        return [f'(ollama){model["name"]}' for model in response.json()["models"]]
     except:
         return []
 

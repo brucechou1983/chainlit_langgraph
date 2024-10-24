@@ -1,32 +1,124 @@
+import typing
+import builtins
+import sys
 import os
 import requests
+from functools import lru_cache
 from chainlit import logger
 from dotenv import load_dotenv
-from typing import Dict, Union, List
+from typing import Dict, Union, List, TypeVar, Optional, Any
+from typing import get_type_hints, get_args, get_origin
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_ollama import ChatOllama
+from inspect import signature
+from datetime import datetime, timedelta
 
 load_dotenv()
 
-# Ollama parameter type definitions
-OLLAMA_INT_PARAMS = {
-    'mirostat', 'num_ctx', 'num_gpu', 'num_thread',
-    'num_predict', 'repeat_last_n', 'top_k', 'seed'
-}
-OLLAMA_FLOAT_PARAMS = {
-    'mirostat_eta', 'mirostat_tau', 'repeat_penalty',
-    'temperature', 'tfs_z', 'top_p'
-}
-OLLAMA_LIST_PARAMS = {'stop'}
-OLLAMA_STR_PARAMS = {
-    'format',  # Can be "" or "json"
-    'base_url',
-    'keep_alive',  # Can be int or str
-    'model'
-}
+T = TypeVar('T')
 
 
-def _parse_ollama_params(parameters: str) -> Dict[str, Union[int, float, List[str], str]]:
+class TimedCache:
+    """Cache with TTL support"""
+
+    def __init__(self, ttl_seconds: int = 300):
+        self.cache = {}
+        self.ttl = ttl_seconds
+
+    def get(self, key: str) -> Optional[T]:
+        if key in self.cache:
+            value, timestamp = self.cache[key]
+            if datetime.now() - timestamp < timedelta(seconds=self.ttl):
+                return value
+            del self.cache[key]
+        return None
+
+    def set(self, key: str, value: T) -> None:
+        self.cache[key] = (value, datetime.now())
+
+
+# 5 minute TTL for model list
+model_cache = TimedCache(ttl_seconds=300)
+
+
+@lru_cache(maxsize=1)
+def get_ollama_param_types() -> Dict[str, Any]:
+    """
+    Dynamically extract and cache parameter types from ChatOllama
+    """
+
+    # Get all modules from langchain packages
+    localns = {}
+    for module_name, module in sys.modules.items():
+        if module_name.startswith(('langchain', 'typing')):
+            if module:
+                localns.update({
+                    k: v for k, v in module.__dict__.items()
+                    if isinstance(v, type) or hasattr(v, '__origin__')
+                })
+
+    # Add built-in types
+    localns.update({
+        k: v for k, v in builtins.__dict__.items()
+        if isinstance(v, type)
+    })
+
+    # Add typing constructs
+    localns.update(typing.__dict__)
+
+    sig = signature(ChatOllama)
+    type_hints = get_type_hints(ChatOllama, localns=localns)
+
+    param_types = {}
+    for param_name, param in sig.parameters.items():
+        if param_name == 'self':
+            continue
+        type_hint = type_hints.get(param_name, Any)
+        param_types[param_name] = type_hint
+
+    return param_types
+
+
+def parse_value(value_str: str, type_hint):
+    """
+    Parse the string value to the type specified by type_hint
+    """
+    origin = get_origin(type_hint)
+    args = get_args(type_hint)
+
+    if origin is Union:
+        # Handle Union types (e.g., Optional[int])
+        for arg_type in args:
+            if arg_type == type(None):
+                continue  # Skip NoneType
+            try:
+                return parse_value(value_str, arg_type)
+            except ValueError:
+                continue
+        raise ValueError(f"Cannot parse {value_str} as {type_hint}")
+    elif type_hint == int:
+        return int(value_str)
+    elif type_hint == float:
+        return float(value_str)
+    elif type_hint == str:
+        return value_str
+    elif origin == list:
+        # Handle lists (assuming comma-separated values)
+        elem_type = args[0] if args else str
+        # Remove possible brackets and split
+        value_str = value_str.strip('[]')
+        elements = [elem.strip() for elem in value_str.split(',')]
+        return [parse_value(elem, elem_type) for elem in elements]
+    elif origin == dict:
+        # Handle dictionaries (assuming JSON format)
+        import json
+        return json.loads(value_str)
+    else:
+        # Fallback to string if type is unknown
+        return value_str
+
+
+def parse_ollama_params(parameters: str) -> Dict[str, Any]:
     """
     Parse the parameters from the Ollama API response
 
@@ -43,41 +135,40 @@ def _parse_ollama_params(parameters: str) -> Dict[str, Union[int, float, List[st
             "stop": ["[INST]", "[/INST]"]
         }
     """
+    param_types = get_ollama_param_types()
     result = {}
+
     if not parameters or not isinstance(parameters, str):
         return result
 
+    # First pass to collect all values for each key
+    collected_values = {}
     for line in parameters.strip().split('\n'):
         parts = line.strip().split(None, 1)
         if len(parts) != 2:
             continue
 
         key, raw_value = parts
-        value = raw_value.strip('"\'')
-        if not value:
+        value_str = raw_value.strip('"\'')
+        if not value_str:
             continue
 
+        if key not in collected_values:
+            collected_values[key] = []
+        collected_values[key].append(value_str)
+
+    # Second pass to parse values with correct types
+    for key, values in collected_values.items():
+        type_hint = param_types.get(key, str)
         try:
-            if key in OLLAMA_LIST_PARAMS:
-                if key not in result:
-                    result[key] = []
-                result[key].append(value)
-            elif key in OLLAMA_INT_PARAMS:
-                result[key] = int(value)
-            elif key in OLLAMA_FLOAT_PARAMS:
-                result[key] = float(value)
-            elif key in OLLAMA_STR_PARAMS:
-                # Special handling for keep_alive which can be int or str
-                if key == 'keep_alive':
-                    try:
-                        result[key] = int(value)
-                    except ValueError:
-                        result[key] = value
-                else:
-                    result[key] = value
-        except (ValueError, TypeError):
+            # If we have multiple values, treat as a list
+            if len(values) > 1:
+                result[key] = [parse_value(v, str) for v in values]
+            else:
+                result[key] = parse_value(values[0], type_hint)
+        except (ValueError, TypeError) as e:
             logger.debug(
-                f"Skipping invalid parameter value: {key}={raw_value}")
+                f"Skipping invalid parameter value for {key}: {values} ({e})")
             continue
 
     return result
@@ -93,7 +184,7 @@ def create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
     if response.status_code == 200:
         response_json = response.json()
         if "parameters" in response_json:
-            params_kwargs = _parse_ollama_params(response_json["parameters"])
+            params_kwargs = parse_ollama_params(response_json["parameters"])
 
     # Merge the parameters from the Ollama API response with the provided kwargs
     # When conflict, kwargs overrides
@@ -102,52 +193,22 @@ def create_chat_ollama_model(name: str, model: str, **kwargs) -> BaseChatModel:
     return ChatOllama(name=name, model=model,
                       base_url=os.getenv("OLLAMA_URL", "http://localhost:11434"), **params_kwargs)
 
-# List all available Ollama models by hitting the api endpoint
-# api endpoint: curl http://localhost:11434/api/tags
-# api response sample:
-# {
-#   "models": [
-#     {
-#       "name": "codellama:13b",
-#       "modified_at": "2023-11-04T14:56:49.277302595-07:00",
-#       "size": 7365960935,
-#       "digest": "9f438cb9cd581fc025612d27f7c1a6669ff83a8bb0ed86c94fcf4c5440555697",
-#       "details": {
-#         "format": "gguf",
-#         "family": "llama",
-#         "families": null,
-#         "parameter_size": "13B",
-#         "quantization_level": "Q4_0"
-#       }
-#     },
-#     {
-#       "name": "llama3:latest",
-#       "modified_at": "2023-12-07T09:32:18.757212583-08:00",
-#       "size": 3825819519,
-#       "digest": "fe938a131f40e6f6d40083c9f0f430a515233eb2edaa6d72eb85c50d64f2300e",
-#       "details": {
-#         "format": "gguf",
-#         "family": "llama",
-#         "families": null,
-#         "parameter_size": "7B",
-#         "quantization_level": "Q4_0"
-#       }
-#     }
-#   ]
-# }
-# when no model is available or an exception, just return an empty list
-
 
 def list_ollama_models(url: str = "http://localhost:11434") -> List[str]:
     """
-    List all available Ollama models by hitting the api endpoint
-
-    Args:
-        url (str): The url of the Ollama API endpoint
+    List Ollama models with TTL cache support
     """
+    cache_key = f"models_{url}"
+    cached_models = model_cache.get(cache_key)
+    if cached_models is not None:
+        return cached_models
+
     try:
         response = requests.get(f"{url}/api/tags")
         response.raise_for_status()
-        return [f'(ollama){model["name"]}' for model in response.json()["models"]]
+        models = [
+            f'(ollama){model["name"]}' for model in response.json()["models"]]
+        model_cache.set(cache_key, models)
+        return models
     except:
         return []

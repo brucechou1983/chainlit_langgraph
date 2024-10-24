@@ -29,8 +29,8 @@ def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwa
         llm = ChatAnthropic(name=name, model=model, **kwargs)
     elif re.match(r"^gpt-*", model):
         llm = ChatOpenAI(name=name, model=model, **kwargs)
-    elif match := re.match(r"^ollama-(.*)", model):
-        "ex: 'ollama-llama3.2' -> 'llama3.2'"
+    elif match := re.match(r"^\(ollama\)(.*)", model):
+        "ex: '(ollama)llama3.2' -> 'llama3.2'"
         model_name = match.group(1)
         llm = _create_chat_ollama_model(name, model_name, **kwargs)
     else:
@@ -86,7 +86,7 @@ def list_ollama_models(url: str = "http://localhost:11434") -> List[str]:
     try:
         response = requests.get(f"{url}/api/tags")
         response.raise_for_status()
-        return [f'ollama-{model["name"]}' for model in response.json()["models"]]
+        return [f'(ollama){model["name"]}' for model in response.json()["models"]]
     except:
         return []
 

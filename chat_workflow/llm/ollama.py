@@ -87,10 +87,9 @@ def parse_value(value_str: str, type_hint):
     args = get_args(type_hint)
 
     if origin is Union:
-        # Handle Union types (e.g., Optional[int])
         for arg_type in args:
             if arg_type == type(None):
-                continue  # Skip NoneType
+                continue
             try:
                 return parse_value(value_str, arg_type)
             except ValueError:
@@ -101,21 +100,24 @@ def parse_value(value_str: str, type_hint):
     elif type_hint == float:
         return float(value_str)
     elif type_hint == str:
-        return value_str
+        # Keep the original string value without stripping special characters
+        return value_str.strip('"\'')
     elif origin == list:
-        # Handle lists (assuming comma-separated values)
+        # For stop tokens, preserve the exact string including brackets
         elem_type = args[0] if args else str
-        # Remove possible brackets and split
-        value_str = value_str.strip('[]')
-        elements = [elem.strip() for elem in value_str.split(',')]
+
+        if value_str.startswith('[') and value_str.endswith(']'):
+            # Single element with brackets - return as is
+            return [value_str.strip('"\'')]
+        # Handle comma-separated list case
+        elements = [elem.strip().strip('"\'') for elem in value_str.split(',')]
         return [parse_value(elem, elem_type) for elem in elements]
     elif origin == dict:
-        # Handle dictionaries (assuming JSON format)
         import json
         return json.loads(value_str)
     else:
-        # Fallback to string if type is unknown
-        return value_str
+
+        return value_str.strip('"\'')
 
 
 def parse_ollama_params(parameters: str) -> Dict[str, Any]:

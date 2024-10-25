@@ -1,5 +1,5 @@
 # **Chainlit LangGraph Chatbot**
-[![Version](https://img.shields.io/badge/Version-0.1.0-blue)](https://github.com/yourusername/chainlit-langgraph)
+[![Version](https://img.shields.io/badge/Version-0.1.1-blue)](https://github.com/yourusername/chainlit-langgraph)
 [![Chainlit](https://img.shields.io/badge/Chainlit-1.3.0-brightgreen)](https://github.com/Chainlit/chainlit)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2.39-brightgreen)](https://github.com/langchain-ai/langgraph)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

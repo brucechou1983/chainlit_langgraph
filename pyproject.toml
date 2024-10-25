@@ -22,11 +22,26 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.36"}
 langchain-community = "^0.3.2"
 pypdf = "^5.0.1"
 
-
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
+commitizen = "^3.30.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+changelog_incremental = true
+update_changelog_on_bump = true
+
+[tool.commitizen.version_files]
+"chat_workflow/version.py" = [
+    '__version__ = "{version}"'
+]
+"README.md" = [
+    'Version-{version}-blue'
+]

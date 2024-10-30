@@ -1,4 +1,4 @@
-# **Chainlit LangGraph Chatbot**
+![](./public/logo_light.png) 
 [![Version](https://img.shields.io/badge/Version-0.1.1-blue)](https://github.com/yourusername/chainlit-langgraph)
 [![Chainlit](https://img.shields.io/badge/Chainlit-1.3.0-brightgreen)](https://github.com/Chainlit/chainlit)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2.39-brightgreen)](https://github.com/langchain-ai/langgraph)
@@ -8,18 +8,17 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
 ![Demo](./resource/screenshot.gif)
 
 ## Table of Contents
-- [**Chainlit LangGraph Chatbot**](#chainlit-langgraph-chatbot)
-  - [Table of Contents](#table-of-contents)
-  - [**Why This Project?**](#why-this-project)
-  - [**Features**](#features)
-  - [**Getting Started**](#getting-started)
-    - [Setting up Ollama (Optional)](#setting-up-ollama-optional)
-  - [**Creating Custom Workflow**](#creating-custom-workflow)
-  - [**Workflows**](#workflows)
-    - [Simple Chat Workflow](#simple-chat-workflow)
-    - [Resume Optimizer](#resume-optimizer)
-    - [Lean Canvas Chat](#lean-canvas-chat)
-  - [Upcoming Features](#upcoming-features)
+- [Table of Contents](#table-of-contents)
+- [**Why This Project?**](#why-this-project)
+- [**Features**](#features)
+- [**Getting Started**](#getting-started)
+  - [Setting up Ollama (Optional)](#setting-up-ollama-optional)
+- [**Creating Custom Workflow**](#creating-custom-workflow)
+- [**Workflows**](#workflows)
+  - [Simple Chat Workflow](#simple-chat-workflow)
+  - [Resume Optimizer](#resume-optimizer)
+  - [Lean Canvas Chat](#lean-canvas-chat)
+- [Upcoming Features](#upcoming-features)
 
 ## **Why This Project?**
 [Chainlit](https://github.com/Chainlit/chainlit) is a powerful tool for building production-ready conversational AI applications. [LangGraph](https://github.com/langchain-ai/langgraph), on the other hand, is a versatile framework for building and managing state graphs in AI applications. This project combines these two to provide a comprehensive solution for building conversational AI agents, in minutes.

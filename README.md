@@ -145,6 +145,8 @@ Each workflow demonstrates different aspects of the Chainlit Langgraph integrati
 
 
 ## Upcoming Features
+- **NVIDIA NIM**: Self-host GPU-accelerated inferencing microservices for pretrained and customized AI models across clouds, data centers, and workstations.
+- **Cloud Deployment**: Easy deployment of the application to cloud platforms like AWS, Azure, or GCP.
 - **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.
 - **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
 - **Image Input**: User can upload images and interact with them.

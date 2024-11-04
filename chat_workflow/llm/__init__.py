@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from .openai import list_openai_models
 from .anthropic import list_anthropic_models
 from .ollama import create_chat_ollama_model, list_ollama_models
+from .xai import list_xai_models
 
 load_dotenv()
 
@@ -17,6 +18,9 @@ def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwa
         llm = ChatAnthropic(name=name, model=model, **kwargs)
     elif re.match(r"^gpt-*", model):
         llm = ChatOpenAI(name=name, model=model, **kwargs)
+    elif re.match(r"grok-*", model):
+        llm = ChatOpenAI(name=name, model=model, api_key=os.getenv("XAI_API_KEY"),
+                         base_url=os.getenv("XAI_BASE_URL"), **kwargs)
     elif match := re.match(r"^\(ollama\)(.*)", model):
         "ex: '(ollama)llama3.2' -> 'llama3.2'"
         model_name = match.group(1)
@@ -32,4 +36,4 @@ def list_available_llm() -> List[str]:
     """
     List all available models
     """
-    return list_ollama_models(os.getenv("OLLAMA_URL", "http://localhost:11434")) + list_openai_models() + list_anthropic_models()
+    return list_ollama_models(os.getenv("OLLAMA_URL", "http://localhost:11434")) + list_openai_models() + list_anthropic_models() + list_xai_models()

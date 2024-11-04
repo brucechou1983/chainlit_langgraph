@@ -29,6 +29,7 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
   - **Ollama**: Open source model.
   - **Claude**: Advanced AI models by Anthropic.
   - **GPT**: Advanced AI models by OpenAI.
+  - **Grok**: Grok models by xAI.
 - **Examples**: Explore a variety of use cases with conversational AI agents examples.
 
 ## **Getting Started**

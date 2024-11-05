@@ -204,7 +204,7 @@ async def on_message(message: cl.Message):
     workflow = WorkflowFactory.create(name=state["chat_profile"])
     logger.debug(f"Chat Profile: {chat_profile}")
 
-    state["messages"] += [HumanMessage(content=message.content)]
+    state["messages"] += [workflow.format_message(message)]
     logger.debug(
         f"Updated state with new message. Total messages: {len(state['messages'])}")
 

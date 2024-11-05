@@ -1,7 +1,7 @@
 import operator
 import chainlit as cl
 from typing import TypedDict, Annotated, Sequence, Dict, Optional
-from langchain_core.messages import AnyMessage
+from langchain_core.messages import AnyMessage, HumanMessage
 from abc import ABC, abstractmethod
 from typing import Dict, Any
 from langgraph.graph import StateGraph, END
@@ -113,3 +113,6 @@ class BaseWorkflow(ABC):
                         else:
                             widget.initial = state[widget.id]
         return await settings.send()
+
+    def format_message(self, message: cl.Message) -> HumanMessage:
+        return HumanMessage(content=message.content)

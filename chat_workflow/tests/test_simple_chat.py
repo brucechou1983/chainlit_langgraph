@@ -53,7 +53,7 @@ async def test_chat_node():
     state = GraphState(
         name="Simple Chat",
         messages=[],
-        chat_model="gpt-4o"  # Use an appropriate test model
+        chat_model="(openai)gpt-4o-mini"  # Use an appropriate test model
     )
     config = {"configurable": {"session_id": "test_session"}}
 
@@ -66,8 +66,8 @@ def test_graph_state():
     state = GraphState(
         name="Simple Chat",
         messages=[],
-        chat_model="gpt-4o"
+        chat_model="(openai)gpt-4o-mini"
     )
     assert state["name"] == "Simple Chat"
     assert len(state["messages"]) == 0
-    assert state["chat_model"] == "gpt-4o"
+    assert state["chat_model"] == "(openai)gpt-4o-mini"

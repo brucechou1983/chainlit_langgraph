@@ -1,10 +1,12 @@
-from chat_workflow.llm.ollama import parse_ollama_params
+from chat_workflow.llm.providers.ollama import OllamaProvider
+
+provider = OllamaProvider()
 
 
 def testparse_ollama_params_empty():
-    assert parse_ollama_params("") == {}
-    assert parse_ollama_params(None) == {}
-    assert parse_ollama_params("    ") == {}
+    assert provider.parse_ollama_params("") == {}
+    assert provider.parse_ollama_params(None) == {}
+    assert provider.parse_ollama_params("    ") == {}
 
 
 def testparse_ollama_params_numeric():
@@ -24,7 +26,7 @@ top_k                          40"""
         "repeat_last_n": 64,
         "top_k": 40
     }
-    assert parse_ollama_params(input_str) == expected
+    assert provider.parse_ollama_params(input_str) == expected
 
 
 def testparse_ollama_params_float():
@@ -44,7 +46,7 @@ top_p                         0.9"""
         "tfs_z": 1.0,
         "top_p": 0.9
     }
-    assert parse_ollama_params(input_str) == expected
+    assert provider.parse_ollama_params(input_str) == expected
 
 
 def testparse_ollama_params_stop():
@@ -58,7 +60,7 @@ stop                           'Assistant:'"""
     expected = {
         "stop": ["[INST]", "[/INST]", "</s>", "User:", "Assistant:"]
     }
-    assert parse_ollama_params(input_str) == expected
+    assert provider.parse_ollama_params(input_str) == expected
 
 
 def testparse_ollama_params_mixed():
@@ -81,29 +83,7 @@ seed                          42"""
         "format": "json",
         "seed": 42
     }
-    assert parse_ollama_params(input_str) == expected
-
-
-# def testparse_ollama_params_error_handling():
-#     # Test various error cases
-#     input_str = """num_ctx                        invalid
-# temperature                    not_a_float
-# num_gpu                        1.5
-# stop
-# incomplete_line
-# temperature                    0.7
-# random_param                   value
-#     malformed     line    with    spaces
-# stop                           "[INST]"
-# """
-
-#     expected = {
-#         "num_gpu": 1,
-#         "temperature": 0.7,
-#         "random_param": "value",
-#         "stop": ["[INST]"]
-#     }
-#     assert parse_ollama_params(input_str) == expected
+    assert provider.parse_ollama_params(input_str) == expected
 
 
 def testparse_ollama_params_whitespace():
@@ -118,4 +98,4 @@ stop              "[INST]"
         "temperature": 0.8,
         "stop": ["[INST]"]
     }
-    assert parse_ollama_params(input_str) == expected
+    assert provider.parse_ollama_params(input_str) == expected

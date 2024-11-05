@@ -1,39 +1,23 @@
 import os
-import re
-from dotenv import load_dotenv
-from typing import Optional, List
+from typing import List, Optional
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_anthropic import ChatAnthropic
-from langchain_openai import ChatOpenAI
-from .openai import list_openai_models
-from .anthropic import list_anthropic_models
-from .ollama import create_chat_ollama_model, list_ollama_models
-from .xai import list_xai_models
+from .factory import LLMFactory
+from .providers import OllamaProvider, OpenAIProvider, AnthropicProvider, XAIProvider, GroqProvider
 
-load_dotenv()
+# Initialize factory
+llm_factory = LLMFactory()
+# Register providers
+llm_factory.register_provider(
+    "ollama", OllamaProvider(os.getenv("OLLAMA_URL")))
+llm_factory.register_provider("openai", OpenAIProvider())
+llm_factory.register_provider("anthropic", AnthropicProvider())
+llm_factory.register_provider("xai", XAIProvider())
+llm_factory.register_provider("groq", GroqProvider())
 
 
 def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:
-    if re.match(r"^claude-*", model):
-        llm = ChatAnthropic(name=name, model=model, **kwargs)
-    elif re.match(r"^gpt-*", model):
-        llm = ChatOpenAI(name=name, model=model, **kwargs)
-    elif re.match(r"grok-*", model):
-        llm = ChatOpenAI(name=name, model=model, api_key=os.getenv("XAI_API_KEY"),
-                         base_url=os.getenv("XAI_BASE_URL"), **kwargs)
-    elif match := re.match(r"^\(ollama\)(.*)", model):
-        "ex: '(ollama)llama3.2' -> 'llama3.2'"
-        model_name = match.group(1)
-        return create_chat_ollama_model(name, model_name, **kwargs)
-
-    if tools is None:
-        return llm
-    else:
-        return llm.bind_tools(tools)
+    return llm_factory.create_model(name, model, tools, **kwargs)
 
 
 def list_available_llm() -> List[str]:
-    """
-    List all available models
-    """
-    return list_ollama_models(os.getenv("OLLAMA_URL", "http://localhost:11434")) + list_openai_models() + list_anthropic_models() + list_xai_models()
+    return llm_factory.list_available_models()

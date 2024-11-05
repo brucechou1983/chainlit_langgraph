@@ -5,7 +5,6 @@ import chainlit as cl
 import chainlit.data as cl_data
 import logging
 import os
-import importlib
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import Runnable
 from chainlit.data.sql_alchemy import SQLAlchemyDataLayer

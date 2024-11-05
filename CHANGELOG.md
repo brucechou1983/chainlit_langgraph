@@ -1,3 +1,15 @@
+## v0.2.0 (2024-11-05)
+
+### Feat
+
+- groq support
+- grok support
+
+### Refactor
+
+- model display naming
+- llm factory pattern
+
 ## v0.1.1 (2024-10-25)
 
 ### Feat

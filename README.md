@@ -16,6 +16,7 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
 - [**Creating Custom Workflow**](#creating-custom-workflow)
 - [**Workflows**](#workflows)
   - [Simple Chat Workflow](#simple-chat-workflow)
+  - [Multimodal Chat Workflow](#multimodal-chat-workflow)
   - [Resume Optimizer](#resume-optimizer)
   - [Lean Canvas Chat](#lean-canvas-chat)
 - [Upcoming Features](#upcoming-features)
@@ -132,6 +133,9 @@ Located in `simple_chat.py`, this workflow provides a basic chatbot experience:
 - Supports multiple language models
 - Includes basic tools like datetime and web search
 
+### [Multimodal Chat Workflow](./chat_workflow/workflows/multimodal_chat.py)
+- Supports images and text inputs
+
 ### [Resume Optimizer](./chat_workflow/workflows/resume_optimizer.py)
 Found in `resume_optimizer.py`, this workflow helps users improve their resumes:
 - Features a resume extractor node to process uploaded PDF resumes
@@ -150,5 +154,4 @@ Each workflow demonstrates different aspects of the Chainlit Langgraph integrati
 - **Cloud Deployment**: Easy deployment of the application to cloud platforms like AWS, Azure, or GCP.
 - **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.
 - **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
-- **Image Input**: User can upload images and interact with them.
 - **Image Generation**: Generate images based on user input.

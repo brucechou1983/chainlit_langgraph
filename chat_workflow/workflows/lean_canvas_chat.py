@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
-from ..llm import create_chat_model, list_available_llm
+from ..llm import llm_factory, ModelCapability
 
 
 class GraphState(BaseState):
@@ -14,6 +14,11 @@ class GraphState(BaseState):
 
 
 class LeanCanvasChatWorkflow(BaseWorkflow):
+    def __init__(self):
+        super().__init__()
+
+        self.capabilities = {ModelCapability.TEXT_TO_TEXT}
+
     def create_graph(self) -> StateGraph:
         graph = StateGraph(GraphState)
         graph.add_node("chat", self.chat_node)
@@ -28,8 +33,8 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
             SystemMessage(content=self.chat_system_prompt),
             MessagesPlaceholder(variable_name="messages"),
         ])
-        llm = create_chat_model(self.output_chat_model,
-                                model=state["chat_model"])
+        llm = llm_factory.create_model(self.output_chat_model,
+                                       model=state["chat_model"])
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke(state, config=config)]
@@ -71,7 +76,8 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
             Select(
                 id="chat_model",
                 label="Chat Model",
-                values=sorted(list_available_llm()),
+                values=sorted(llm_factory.list_models(
+                    capabilities=self.capabilities)),
                 initial_index=0,
             ),
         ])

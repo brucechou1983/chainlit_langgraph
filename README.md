@@ -1,6 +1,6 @@
 ![](./public/logo_light.png) 
 [![Version](https://img.shields.io/badge/Version-0.2.0-blue)](https://github.com/yourusername/chainlit-langgraph)
-[![Chainlit](https://img.shields.io/badge/Chainlit-1.3.0-brightgreen)](https://github.com/Chainlit/chainlit)
+[![Chainlit](https://img.shields.io/badge/Chainlit-1.3.1-brightgreen)](https://github.com/Chainlit/chainlit)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2.45-brightgreen)](https://github.com/langchain-ai/langgraph)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 Rapidly build and deploy production-ready conversational AI agents using Chainlit and LangGraph. This powerful integration combines state-of-the-art language models with flexible workflow management, enabling developers to create sophisticated chatbots, virtual assistants, and interactive AI applications in minutes.
@@ -16,6 +16,7 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
 - [**Creating Custom Workflow**](#creating-custom-workflow)
 - [**Workflows**](#workflows)
   - [Simple Chat Workflow](#simple-chat-workflow)
+  - [Multimodal Chat Workflow](#multimodal-chat-workflow)
   - [Resume Optimizer](#resume-optimizer)
   - [Lean Canvas Chat](#lean-canvas-chat)
 - [Upcoming Features](#upcoming-features)
@@ -132,6 +133,9 @@ Located in `simple_chat.py`, this workflow provides a basic chatbot experience:
 - Supports multiple language models
 - Includes basic tools like datetime and web search
 
+### [Multimodal Chat Workflow](./chat_workflow/workflows/multimodal_chat.py)
+- Supports images and text inputs
+
 ### [Resume Optimizer](./chat_workflow/workflows/resume_optimizer.py)
 Found in `resume_optimizer.py`, this workflow helps users improve their resumes:
 - Features a resume extractor node to process uploaded PDF resumes
@@ -150,5 +154,4 @@ Each workflow demonstrates different aspects of the Chainlit Langgraph integrati
 - **Cloud Deployment**: Easy deployment of the application to cloud platforms like AWS, Azure, or GCP.
 - **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.
 - **OpenAI o1-like agentic workflow**: Advanced self-prompting agentic workflow.
-- **Image Input**: User can upload images and interact with them.
 - **Image Generation**: Generate images based on user input.

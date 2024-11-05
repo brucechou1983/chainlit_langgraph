@@ -1,6 +1,7 @@
 from typing import Dict, Optional, List
 from langchain_core.language_models.chat_models import BaseChatModel
 from .providers.base import LLMProvider
+from .capabilities import ModelCapability
 
 
 class LLMFactory:
@@ -15,12 +16,23 @@ class LLMFactory:
             prefix = f"({provider_name})"
             if model.startswith(prefix):
                 model_name = model.replace(prefix, "")
-                return provider.create_model(name, model_name, tools, **kwargs)
+                if ModelCapability.TOOL_CALLING in provider.capabilities.get(model_name, set()):
+                    return provider.create_model(name, model_name, tools, **kwargs)
+                else:
+                    if tools is not None:
+                        raise ValueError(
+                            f"Model {model_name} does not support tool calling")
+                    return provider.create_model(name, model_name, **kwargs)
         raise ValueError(f"No provider found for model: {model}")
 
-    def list_available_models(self) -> List[str]:
+    def list_models(self, capabilities: Optional[set[ModelCapability]] = None) -> List[str]:
         models = []
         for provider in self._providers.values():
-            models.extend(
-                [f"({provider.name}){model_name}" for model_name in provider.list_models()])
+            provider_models = provider.list_models()
+            if capabilities:
+                models.extend([f"({provider.name}){model_name}" for model_name in provider_models
+                               if all(cap in provider.capabilities.get(model_name, set()) for cap in capabilities)])
+            else:
+                models.extend(
+                    [f"({provider.name}){model_name}" for model_name in provider_models])
         return models

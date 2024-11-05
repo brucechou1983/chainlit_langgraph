@@ -1,7 +1,8 @@
 import chainlit as cl
+import base64
 from chainlit.input_widget import Select
 from langgraph.graph import StateGraph
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
@@ -16,12 +17,12 @@ class GraphState(BaseState):
     chat_model: str
 
 
-class SimpleChatWorkflow(BaseWorkflow):
+class MultimodalChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
 
         self.capabilities = {
-            ModelCapability.TEXT_TO_TEXT, ModelCapability.TOOL_CALLING}
+            ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING}
         self.tools = [get_datetime_now] + get_search_tools()
 
     def create_graph(self) -> StateGraph:
@@ -56,7 +57,7 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     @classmethod
     def name(cls) -> str:
-        return "Simple Chat"
+        return "Multimodal Chat"
 
     @property
     def output_chat_model(self) -> str:
@@ -67,8 +68,7 @@ class SimpleChatWorkflow(BaseWorkflow):
         return cl.ChatProfile(
             name=cls.name(),
             markdown_description="A ChatGPT-like chatbot.",
-            icon="https://cdn1.iconfinder.com/data/icons/3d-front-color/128/chat-text-front-color.png",
-            default=True,
+            icon="https://cdn0.iconfinder.com/data/icons/essential-pack-1-3d/64/picture.png",
             starters=[
                 cl.Starter(
                     label="Write a snake game in Python.",
@@ -99,3 +99,25 @@ class SimpleChatWorkflow(BaseWorkflow):
                 initial_index=0,
             ),
         ])
+
+    def format_message(self, msg: cl.Message) -> HumanMessage:
+        """Format chainlit message to LangChain message with multimodal support"""
+        if not msg.elements:
+            return HumanMessage(content=msg.content)
+
+        # Initialize the multimodal content list
+        formatted_content = [{"type": "text", "text": msg.content}]
+
+        # Process images
+        images = [file for file in msg.elements if "image" in file.mime]
+        for image in images:
+            with open(image.path, "rb") as img_file:
+                image_data = base64.b64encode(img_file.read()).decode("utf-8")
+                formatted_content.append({
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/jpeg;base64,{image_data}"
+                    }
+                })
+
+        return HumanMessage(content=formatted_content)

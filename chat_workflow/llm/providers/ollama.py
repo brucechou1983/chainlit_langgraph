@@ -1,4 +1,5 @@
 import builtins
+import json
 import sys
 import os
 import requests
@@ -7,11 +8,12 @@ from chainlit import logger
 from datetime import datetime, timedelta
 from functools import lru_cache
 from inspect import signature
-from typing import List, Optional, TypeVar, Dict, Any, Union
+from typing import List, Optional, TypeVar, Dict, Any, Union, Set
 from typing import get_type_hints, get_args, get_origin
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_ollama import ChatOllama
 from .base import LLMProvider
+from ..capabilities import ModelCapability
 
 T = TypeVar('T')
 
@@ -48,7 +50,7 @@ class OllamaProvider(LLMProvider):
         base_url = os.getenv("OLLAMA_URL")
         response = requests.post(
             f"{base_url}/api/show", json={"name": model})
-        logger.debug(f"Response: {response}")
+        logger.debug(f"Response: {json.dumps(response.json(), indent=2)}")
         params_kwargs = {}
         if response.status_code == 200:
             response_json = response.json()
@@ -216,3 +218,63 @@ class OllamaProvider(LLMProvider):
     @property
     def name(self) -> str:
         return "ollama"
+
+    @property
+    def capabilities(self) -> Dict[str, Set[ModelCapability]]:
+        # Currently Ollama doesn't have a way to query capabilities
+        # But we can infer some capabilities based on model metadata
+        def get_model_capabilities(metadata: dict) -> Set[ModelCapability]:
+            capability_keywords = {
+                ModelCapability.TEXT_TO_TEXT: ["text", "response", "conversation", "Q&A", "template"],
+                ModelCapability.IMAGE_TO_TEXT: ["vision", "image", "CLIP", "image encoder", "patch_size", "projection_dim"],
+                ModelCapability.TOOL_CALLING: [
+                    "tool", "tool_calls", "function call", "parameters",
+                    "function name", "arguments", "tool calling capabilities"
+                ],
+                ModelCapability.STRUCTURED_OUTPUT: [
+                    "json", "structured", "format", "parameters", "dictionary"]
+            }
+
+            detected_capabilities = set(
+                [ModelCapability.TEXT_TO_TEXT])  # Base capability
+
+            # Check template for tool calling patterns
+            template = metadata.get("template", "").lower()
+            for capability, keywords in capability_keywords.items():
+                if any(keyword in template for keyword in keywords):
+                    detected_capabilities.add(capability)
+
+            # Check for JSON function call format in template
+            if '"name":' in template and '"parameters":' in template:
+                detected_capabilities.add(ModelCapability.TOOL_CALLING)
+                detected_capabilities.add(ModelCapability.STRUCTURED_OUTPUT)
+
+            return detected_capabilities
+
+        try:
+            cache_key = f"capabilities_{self.base_url}"
+            cached_capabilities = model_cache.get(cache_key)
+            if cached_capabilities is not None:
+                return cached_capabilities
+
+            response = requests.get(f"{self.base_url}/api/tags")
+            response.raise_for_status()
+            logger.debug(f"API response: {response.json()}")
+
+            model_capabilities = {}
+            for model in response.json()["models"]:
+                # Get detailed info for each model
+                show_response = requests.post(
+                    f"{self.base_url}/api/show",
+                    json={"name": model["name"]}
+                )
+                show_response.raise_for_status()
+                capabilities = get_model_capabilities(show_response.json())
+                model_capabilities[model["name"]] = capabilities
+
+            model_cache.set(cache_key, model_capabilities)
+            logger.debug(f"Model capabilities: {model_capabilities}")
+            return model_capabilities
+        except Exception as e:
+            logger.error(f"Error getting capabilities: {e}")
+            return {}

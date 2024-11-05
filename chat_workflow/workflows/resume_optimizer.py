@@ -7,7 +7,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
-from ..llm import create_chat_model, list_available_llm
+from ..llm import llm_factory, ModelCapability
 # from ..tools import BasicToolNode
 # from ..tools.search import get_search_tools
 # from ..tools.time import get_datetime_now
@@ -30,6 +30,7 @@ class ResumeOptimizerWorkflow(BaseWorkflow):
 
         # TODO: check tool availability
         # self.tools = [get_datetime_now] + get_search_tools()
+        self.capabilities = {ModelCapability.TEXT_TO_TEXT}
 
     def create_graph(self) -> StateGraph:
         graph = StateGraph(GraphState)
@@ -123,8 +124,8 @@ Based on the above guidelines, please provide a detailed and specific modificati
         ])
 
         logger.info(f"Prompt: {prompt}")
-        llm = create_chat_model(self.output_chat_model,
-                                model=state["chat_model"])
+        llm = llm_factory.create_model(self.output_chat_model,
+                                       model=state["chat_model"])
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke({"messages": state["messages"]}, config=config)]
@@ -167,7 +168,8 @@ Based on the above guidelines, please provide a detailed and specific modificati
             Select(
                 id="chat_model",
                 label="Chat Model",
-                values=sorted(list_available_llm()),
+                values=sorted(llm_factory.list_models(
+                    capabilities=self.capabilities)),
                 initial_index=0,
             ),
         ])

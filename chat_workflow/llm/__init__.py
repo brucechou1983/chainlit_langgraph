@@ -2,6 +2,7 @@ import os
 from typing import List, Optional
 from langchain_core.language_models.chat_models import BaseChatModel
 from .factory import LLMFactory
+from .capabilities import ModelCapability  # noqa
 from .providers import OllamaProvider, OpenAIProvider, AnthropicProvider, XAIProvider, GroqProvider
 
 # Initialize factory
@@ -13,11 +14,3 @@ llm_factory.register_provider("openai", OpenAIProvider())
 llm_factory.register_provider("anthropic", AnthropicProvider())
 llm_factory.register_provider("xai", XAIProvider())
 llm_factory.register_provider("groq", GroqProvider())
-
-
-def create_chat_model(name: str, model: str, tools: Optional[List] = None, **kwargs) -> BaseChatModel:
-    return llm_factory.create_model(name, model, tools, **kwargs)
-
-
-def list_available_llm() -> List[str]:
-    return llm_factory.list_available_models()

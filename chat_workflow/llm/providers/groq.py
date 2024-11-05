@@ -1,10 +1,10 @@
 import os
 import requests
-from typing import List, Optional
+from typing import List, Optional, Dict, Set
 from langchain_groq import ChatGroq
 from langchain_core.language_models.chat_models import BaseChatModel
-
 from .base import LLMProvider
+from ..capabilities import ModelCapability
 
 
 class GroqProvider(LLMProvider):
@@ -26,3 +26,12 @@ class GroqProvider(LLMProvider):
     @property
     def name(self) -> str:
         return "groq"
+
+    @property
+    def capabilities(self) -> Dict[str, Set[ModelCapability]]:
+        return {
+            "llama-3.2-3b-preview": {ModelCapability.TEXT_TO_TEXT, ModelCapability.TOOL_CALLING},
+            "llama-3.2-11b-vision-preview": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING},
+            "llama-3.2-90b-vision-preview": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING},
+            "whisper-large-v3": {ModelCapability.AUDIO_TO_TEXT},
+        }

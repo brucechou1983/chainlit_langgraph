@@ -1,9 +1,10 @@
 import os
 from openai import OpenAI
-from typing import List, Optional
+from typing import List, Optional, Dict, Set
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models.chat_models import BaseChatModel
 from .base import LLMProvider
+from ..capabilities import ModelCapability
 
 
 class XAIProvider(LLMProvider):
@@ -58,3 +59,9 @@ class XAIProvider(LLMProvider):
     @property
     def name(self) -> str:
         return "xai"
+
+    @property
+    def capabilities(self) -> Dict[str, Set[ModelCapability]]:
+        return {
+            "grok-beta": {ModelCapability.TEXT_TO_TEXT, ModelCapability.TOOL_CALLING},
+        }

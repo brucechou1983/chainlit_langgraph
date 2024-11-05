@@ -5,7 +5,7 @@ from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import Runnable, RunnableConfig
 from .base import BaseWorkflow, BaseState
-from ..llm import create_chat_model, list_available_llm
+from ..llm import llm_factory, ModelCapability
 from ..tools import BasicToolNode
 from ..tools.search import get_search_tools
 from ..tools.time import get_datetime_now
@@ -20,6 +20,8 @@ class SimpleChatWorkflow(BaseWorkflow):
     def __init__(self):
         super().__init__()
 
+        self.capabilities = {
+            ModelCapability.TEXT_TO_TEXT, ModelCapability.TOOL_CALLING}
         self.tools = [get_datetime_now] + get_search_tools()
 
     def create_graph(self) -> StateGraph:
@@ -38,7 +40,7 @@ class SimpleChatWorkflow(BaseWorkflow):
             SystemMessage(content="You're a helpful assistant."),
             MessagesPlaceholder(variable_name="messages"),
         ])
-        llm = create_chat_model(
+        llm = llm_factory.create_model(
             self.output_chat_model, model=state["chat_model"], tools=self.tools)
         chain: Runnable = prompt | llm
         return {
@@ -92,7 +94,8 @@ class SimpleChatWorkflow(BaseWorkflow):
             Select(
                 id="chat_model",
                 label="Chat Model",
-                values=sorted(list_available_llm()),
+                values=sorted(llm_factory.list_models(
+                    capabilities=self.capabilities)),
                 initial_index=0,
             ),
         ])

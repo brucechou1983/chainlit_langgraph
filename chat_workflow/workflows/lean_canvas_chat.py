@@ -33,8 +33,8 @@ class LeanCanvasChatWorkflow(BaseWorkflow):
             SystemMessage(content=self.chat_system_prompt),
             MessagesPlaceholder(variable_name="messages"),
         ])
-        llm = create_model(self.output_chat_model,
-                           model=state["chat_model"])
+        llm = llm_factory.create_model(self.output_chat_model,
+                                       model=state["chat_model"])
         chain: Runnable = prompt | llm
         return {
             "messages": [await chain.ainvoke(state, config=config)]

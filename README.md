@@ -1,5 +1,5 @@
 ![](./public/logo_light.png) 
-[![Version](https://img.shields.io/badge/Version-0.2.0-blue)](https://github.com/yourusername/chainlit-langgraph)
+[![Version](https://img.shields.io/badge/Version-0.3.0-blue)](https://github.com/yourusername/chainlit-langgraph)
 [![Chainlit](https://img.shields.io/badge/Chainlit-1.3.1-brightgreen)](https://github.com/Chainlit/chainlit)
 [![LangGraph](https://img.shields.io/badge/LangGraph-0.2.45-brightgreen)](https://github.com/langchain-ai/langgraph)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)

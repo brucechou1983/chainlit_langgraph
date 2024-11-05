@@ -1,3 +1,15 @@
+## v0.3.0 (2024-11-05)
+
+### Feat
+
+- image capability
+- model capability
+
+### Fix
+
+- wrong capability of haiku
+- missing llm_factory
+
 ## v0.2.0 (2024-11-05)
 
 ### Feat

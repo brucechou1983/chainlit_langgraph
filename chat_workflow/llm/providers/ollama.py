@@ -11,7 +11,7 @@ from typing import List, Optional, TypeVar, Dict, Any, Union
 from typing import get_type_hints, get_args, get_origin
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_ollama import ChatOllama
-from ..base import LLMProvider
+from .base import LLMProvider
 
 T = TypeVar('T')
 
@@ -73,8 +73,8 @@ class OllamaProvider(LLMProvider):
         try:
             response = requests.get(f"{self.base_url}/api/tags")
             response.raise_for_status()
-            models = [
-                f'({self.name}){model["name"]}' for model in response.json()["models"]]
+            models = [f'{model["name"]}' for model in response.json()[
+                "models"]]
             model_cache.set(cache_key, models)
             return models
         except:

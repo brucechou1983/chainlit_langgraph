@@ -2,7 +2,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from typing import Optional, List
-from ..base import LLMProvider
+from .base import LLMProvider
 
 
 class OpenAIProvider(LLMProvider):
@@ -44,7 +44,7 @@ class OpenAIProvider(LLMProvider):
             client = OpenAI()
             response = client.models.list()
             # Only use model id starting with "gpt-4o-"
-            return [f'({self.name}){model.id}' for model in response.data if model.id.startswith("gpt-4o-")]
+            return [f'{model.id}' for model in response.data if model.id.startswith("gpt-4o-")]
         except Exception as e:
             return []
 

@@ -1,6 +1,6 @@
 from typing import Dict, Optional, List
 from langchain_core.language_models.chat_models import BaseChatModel
-from .base import LLMProvider
+from .providers.base import LLMProvider
 
 
 class LLMFactory:
@@ -21,5 +21,6 @@ class LLMFactory:
     def list_available_models(self) -> List[str]:
         models = []
         for provider in self._providers.values():
-            models.extend(provider.list_models())
+            models.extend(
+                [f"({provider.name}){model_name}" for model_name in provider.list_models()])
         return models

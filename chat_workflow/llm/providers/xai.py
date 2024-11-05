@@ -3,7 +3,7 @@ from openai import OpenAI
 from typing import List, Optional
 from langchain_openai import ChatOpenAI
 from langchain_core.language_models.chat_models import BaseChatModel
-from ..base import LLMProvider
+from .base import LLMProvider
 
 
 class XAIProvider(LLMProvider):
@@ -51,7 +51,7 @@ class XAIProvider(LLMProvider):
             client = OpenAI(api_key=os.getenv("XAI_API_KEY"),
                             base_url=os.getenv("XAI_BASE_URL"))
             response = client.models.list()
-            return [f'({self.name}){model.id}' for model in response.data]
+            return [f'{model.id}' for model in response.data]
         except Exception as e:
             return []
 

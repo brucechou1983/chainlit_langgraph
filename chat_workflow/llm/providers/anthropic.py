@@ -32,6 +32,6 @@ class AnthropicProvider(LLMProvider):
     @property
     def capabilities(self) -> Dict[str, Set[ModelCapability]]:
         return {
-            "claude-3-5-haiku-20241022": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "claude-3-5-haiku-20241022": {ModelCapability.TEXT_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
             "claude-3-5-sonnet-20241022": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
         }

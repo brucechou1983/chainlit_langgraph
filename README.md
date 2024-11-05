@@ -1,7 +1,7 @@
 ![](./public/logo_light.png) 
 [![Version](https://img.shields.io/badge/Version-0.1.1-blue)](https://github.com/yourusername/chainlit-langgraph)
 [![Chainlit](https://img.shields.io/badge/Chainlit-1.3.0-brightgreen)](https://github.com/Chainlit/chainlit)
-[![LangGraph](https://img.shields.io/badge/LangGraph-0.2.39-brightgreen)](https://github.com/langchain-ai/langgraph)
+[![LangGraph](https://img.shields.io/badge/LangGraph-0.2.45-brightgreen)](https://github.com/langchain-ai/langgraph)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 Rapidly build and deploy production-ready conversational AI agents using Chainlit and LangGraph. This powerful integration combines state-of-the-art language models with flexible workflow management, enabling developers to create sophisticated chatbots, virtual assistants, and interactive AI applications in minutes.
 

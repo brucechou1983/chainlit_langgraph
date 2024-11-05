@@ -1,6 +1,6 @@
 import chainlit as cl
 import base64
-from chainlit.input_widget import Select
+from chainlit.input_widget import Select, TextInput
 from langgraph.graph import StateGraph
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -15,6 +15,9 @@ from ..tools.time import get_datetime_now
 class GraphState(BaseState):
     # Model name of the chatbot
     chat_model: str
+
+    # System Prompt
+    chat_system_prompt: str
 
 
 class MultimodalChatWorkflow(BaseWorkflow):
@@ -38,7 +41,7 @@ class MultimodalChatWorkflow(BaseWorkflow):
 
     async def chat_node(self, state: GraphState, config: RunnableConfig) -> GraphState:
         prompt = ChatPromptTemplate.from_messages([
-            SystemMessage(content="You're a helpful assistant."),
+            SystemMessage(content=state["chat_system_prompt"]),
             MessagesPlaceholder(variable_name="messages"),
         ])
         llm = llm_factory.create_model(
@@ -89,6 +92,10 @@ class MultimodalChatWorkflow(BaseWorkflow):
         )
 
     @property
+    def default_system_prompt(self) -> str:
+        return "You are a helpful assistant."
+
+    @property
     def chat_settings(self) -> cl.ChatSettings:
         return cl.ChatSettings([
             Select(
@@ -98,6 +105,13 @@ class MultimodalChatWorkflow(BaseWorkflow):
                     capabilities=self.capabilities)),
                 initial_index=0,
             ),
+            TextInput(
+                id="chat_system_prompt",
+                label="System Prompt",
+                initial=self.default_system_prompt,
+                multiline=True,
+                placeholder="Enter a system prompt for the chatbot.",
+            )
         ])
 
     def format_message(self, msg: cl.Message) -> HumanMessage:

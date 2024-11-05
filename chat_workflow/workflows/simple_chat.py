@@ -1,5 +1,5 @@
 import chainlit as cl
-from chainlit.input_widget import Select
+from chainlit.input_widget import Select, TextInput
 from langgraph.graph import StateGraph
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -14,6 +14,9 @@ from ..tools.time import get_datetime_now
 class GraphState(BaseState):
     # Model name of the chatbot
     chat_model: str
+
+    # System Prompt
+    chat_system_prompt: str
 
 
 class SimpleChatWorkflow(BaseWorkflow):
@@ -37,7 +40,7 @@ class SimpleChatWorkflow(BaseWorkflow):
 
     async def chat_node(self, state: GraphState, config: RunnableConfig) -> GraphState:
         prompt = ChatPromptTemplate.from_messages([
-            SystemMessage(content="You're a helpful assistant."),
+            SystemMessage(content=state["chat_system_prompt"]),
             MessagesPlaceholder(variable_name="messages"),
         ])
         llm = llm_factory.create_model(
@@ -89,6 +92,10 @@ class SimpleChatWorkflow(BaseWorkflow):
         )
 
     @property
+    def default_system_prompt(self) -> str:
+        return "You are a helpful assistant."
+
+    @property
     def chat_settings(self) -> cl.ChatSettings:
         return cl.ChatSettings([
             Select(
@@ -98,4 +105,11 @@ class SimpleChatWorkflow(BaseWorkflow):
                     capabilities=self.capabilities)),
                 initial_index=0,
             ),
+            TextInput(
+                id="chat_system_prompt",
+                label="System Prompt",
+                initial=self.default_system_prompt,
+                multiline=True,
+                placeholder="Enter a system prompt for the chatbot.",
+            )
         ])

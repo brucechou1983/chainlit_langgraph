@@ -32,6 +32,7 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
   - **GPT**: Advanced AI models by OpenAI.
   - **Grok**: Grok models by xAI.
   - **Groq**: Fast inference service by Groq.
+  - **Gemini**: Google AI models.
 - **Examples**: Explore a variety of use cases with conversational AI agents examples.
 
 ## **Getting Started**

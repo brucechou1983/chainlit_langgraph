@@ -154,6 +154,7 @@ Each workflow demonstrates different aspects of the Chainlit Langgraph integrati
 
 
 ## Upcoming Features
+- **Research Assistant**: A research assistant that can help users with their general research tasks, like NotebookLM.
 - **NVIDIA NIM**: Self-host GPU-accelerated inferencing microservices for pretrained and customized AI models across clouds, data centers, and workstations.
 - **Cloud Deployment**: Easy deployment of the application to cloud platforms like AWS, Azure, or GCP.
 - **Graph Builder**: A meta-workflow builder that allows users to create custom workflows with natural language.

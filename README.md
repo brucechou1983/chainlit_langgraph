@@ -28,11 +28,11 @@ Rapidly build and deploy production-ready conversational AI agents using Chainli
 - **Building Blocks**: Utilize a variety of building blocks to create your own conversational AI agents.
 - **Multiple LLM Support**: Automatically detects and uses the following LLMs:
   - **Ollama**: Open source model.
-  - **Claude**: Advanced AI models by Anthropic.
-  - **GPT**: Advanced AI models by OpenAI.
-  - **Grok**: Grok models by xAI.
-  - **Groq**: Fast inference service by Groq.
-  - **Gemini**: Google AI models.
+  - **Claude**: Advanced AI models by Anthropic. [Apply API Key Here](https://console.anthropic.com/account/keys)
+  - **GPT**: Advanced AI models by OpenAI. [Apply API Key Here](https://platform.openai.com/settings/organization/api-keys)
+  - **Grok**: Grok models by xAI. [Apply API Key Here](https://docs.x.ai/docs/quickstart#creating-an-api-key)
+  - **Groq**: Fast inference service by Groq. [Apply API Key Here](https://console.groq.com/keys)
+  - **Gemini**: Google AI models. [Apply API Key Here](https://aistudio.google.com/app/apikey)
 - **Examples**: Explore a variety of use cases with conversational AI agents examples.
 
 ## **Getting Started**

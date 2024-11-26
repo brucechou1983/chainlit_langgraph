@@ -154,6 +154,7 @@ Each workflow demonstrates different aspects of the Chainlit Langgraph integrati
 
 
 ## Upcoming Features
+- **Model Context Protocol**: An open [protocol](https://modelcontextprotocol.io) that enables seamless integration between LLM applications and external data sources and tools. Open sourced by Anthropic.
 - **Research Assistant**: A research assistant that can help users with their general research tasks, like NotebookLM.
 - **NVIDIA NIM**: Self-host GPU-accelerated inferencing microservices for pretrained and customized AI models across clouds, data centers, and workstations.
 - **Cloud Deployment**: Easy deployment of the application to cloud platforms like AWS, Azure, or GCP.

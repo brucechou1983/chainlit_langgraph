@@ -8,6 +8,8 @@
 
 Rapidly build and deploy production-ready conversational AI agents using Chainlit and LangGraph. This powerful integration combines state-of-the-art language models with flexible workflow management, enabling developers to create sophisticated chatbots, virtual assistants, and interactive AI applications in minutes.
 
+Find a way to run your open source models? This is a free tool for you.
+
 ![Demo](./resource/screenshot.gif)
 
 ## Table of Contents

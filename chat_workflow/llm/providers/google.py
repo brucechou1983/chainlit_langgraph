@@ -20,7 +20,7 @@ class GoogleProvider(LLMProvider):
         return llm.bind_tools(tools) if tools else llm
 
     def list_models(self) -> List[str]:
-        return ["gemini-1.5-pro", "gemini-1.5-flash"]
+        return ["gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-1.5-flash"]
 
     @property
     def name(self) -> str:
@@ -29,6 +29,7 @@ class GoogleProvider(LLMProvider):
     @property
     def capabilities(self) -> Dict[str, Set[ModelCapability]]:
         return {
+            "gemini-2.0-flash-exp": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING},
             "gemini-1.5-pro": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING},
             "gemini-1.5-flash": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING},
         }

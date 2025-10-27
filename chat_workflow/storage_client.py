@@ -3,7 +3,7 @@ import hashlib
 import uuid
 from typing import Any, Dict, Union
 from chainlit.logger import logger
-from chainlit.data.base import BaseStorageClient
+from chainlit.data.storage_clients.base import BaseStorageClient
 from sqlalchemy import Column, String, Boolean, Integer, ForeignKey, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB, ARRAY
 from sqlalchemy.ext.declarative import declarative_base
@@ -66,6 +66,41 @@ class MinIOStorageClient(BaseStorageClient):
         except Exception as e:
             logger.warning(f"MinIOStorageClient, upload_file error: {e}")
             return {}
+
+    async def get_read_url(self, object_key: str) -> str:
+        """
+        Generate a presigned URL for reading/downloading a file from MinIO
+        """
+        try:
+            url = self.client.generate_presigned_url(
+                'get_object',
+                Params={'Bucket': self.bucket, 'Key': object_key},
+                ExpiresIn=3600  # URL valid for 1 hour
+            )
+            return url
+        except Exception as e:
+            logger.warning(f"MinIOStorageClient, get_read_url error: {e}")
+            return f"{self.client.meta.endpoint_url}/{self.bucket}/{object_key}"
+
+    async def delete_file(self, object_key: str) -> bool:
+        """
+        Delete a file from MinIO storage
+        """
+        try:
+            self.client.delete_object(Bucket=self.bucket, Key=object_key)
+            logger.info(f"Deleted file: {object_key}")
+            return True
+        except Exception as e:
+            logger.warning(f"MinIOStorageClient, delete_file error: {e}")
+            return False
+
+    async def close(self) -> None:
+        """
+        Close the storage client connection (cleanup if needed)
+        """
+        # boto3 client doesn't require explicit closing
+        logger.info("MinIOStorageClient closed")
+        pass
 
 
 Base = declarative_base()

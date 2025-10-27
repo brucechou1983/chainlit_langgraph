@@ -55,13 +55,14 @@ class OpenAIProvider(LLMProvider):
     @property
     def capabilities(self) -> Dict[str, Set[ModelCapability]]:
         return {
-            "gpt-4o": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
-            "gpt-4o-mini": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
-            "gpt-4o-audio-preview": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT, ModelCapability.AUDIO_TO_TEXT, ModelCapability.TEXT_TO_AUDIO},
-            # "gpt-4o-realtime": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT, ModelCapability.AUDIO_TO_TEXT, ModelCapability.TEXT_TO_AUDIO},
-            "text-embedding-3-large": {ModelCapability.TEXT_EMBEDDING},
-            "text-embedding-3-small": {ModelCapability.TEXT_EMBEDDING},
-            "tts-1": {ModelCapability.TEXT_TO_AUDIO},
-            "whisper-1": {ModelCapability.AUDIO_TO_TEXT},
-            "dalle-3": {ModelCapability.TEXT_TO_IMAGE},
+            # GPT-5 models (released August 2025)
+            "gpt-5": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-2025-08-07": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-mini": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-mini-2025-08-07": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-nano": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-nano-2025-08-07": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-chat-latest": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-pro": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
+            "gpt-5-codex": {ModelCapability.TEXT_TO_TEXT, ModelCapability.IMAGE_TO_TEXT, ModelCapability.TOOL_CALLING, ModelCapability.STRUCTURED_OUTPUT},
         }

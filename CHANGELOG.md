@@ -25,6 +25,10 @@
 - Updated import path for BaseStorageClient from `chainlit.data.base` to `chainlit.data.storage_clients.base`
 - Removed deprecated `chainlit.telemetry.trace` decorator from auth.py
 - Fixed CVE-2024-47874 via FastAPI/Starlette security updates
+- Fixed UI text display issue by updating translation files to Chainlit 2.8.3 format
+  - Updated en-US.json to new flat structure (common, auth, chat hierarchy)
+  - Removed 18 legacy translation files that used old 1.x nested structure
+  - UI now properly displays buttons, labels, and dialog text
 
 ### Migration
 

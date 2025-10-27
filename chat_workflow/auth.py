@@ -2,12 +2,10 @@ from typing import Awaitable, Callable, Dict, Optional
 
 from chainlit.config import config
 from chainlit.oauth_providers import get_configured_oauth_providers
-from chainlit.telemetry import trace
 from chainlit.user import User
 from chainlit.utils import wrap_user_function
 
 
-@trace
 def maybe_oauth_callback(
     func: Callable[
         [str, str, Dict[str, str], User, Optional[str]], Awaitable[Optional[User]]

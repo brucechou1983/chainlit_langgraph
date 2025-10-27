@@ -1,3 +1,42 @@
+## v0.4.0 (2025-10-27)
+
+### Changed
+
+- **BREAKING:** Upgraded Chainlit from 1.3.1 to 2.8.3
+- **BREAKING:** Configuration file structure changed (removed deprecated theme and audio sections)
+- **BREAKING:** Python 3.8 support dropped (minimum Python 3.10)
+- Upgraded LangGraph from 0.2.45 to 1.0.1 (backward compatible)
+- Updated LangChain packages to latest compatible versions (langchain-openai 0.3.35, langchain-anthropic 0.3.0)
+- Upgraded Docker base image from Python 3.10 to 3.11
+
+### Added
+
+- Implemented missing BaseStorageClient methods for Chainlit 2.x compatibility
+  - `get_read_url()` for presigned URL generation
+  - `delete_file()` for file deletion from MinIO
+  - `close()` for cleanup operations
+- Comprehensive migration documentation (MIGRATION_PLAN.md, UPGRADE_SUMMARY.md, UPGRADE_CHECKLIST.md)
+- Better security with secure cookie-based authentication
+- Improved UI with Shadcn/Tailwind rewrite from Chainlit 2.x
+- Access to LangGraph 1.0 features (node caching, deferred nodes, commands)
+
+### Fixed
+
+- Updated import path for BaseStorageClient from `chainlit.data.base` to `chainlit.data.storage_clients.base`
+- Removed deprecated `chainlit.telemetry.trace` decorator from auth.py
+- Fixed CVE-2024-47874 via FastAPI/Starlette security updates
+- Fixed UI text display issue by updating translation files to Chainlit 2.8.3 format
+  - Updated en-US.json to new flat structure (common, auth, chat hierarchy)
+  - Removed 18 legacy translation files that used old 1.x nested structure
+  - UI now properly displays buttons, labels, and dialog text
+
+### Migration
+
+- See [MIGRATION_PLAN.md](MIGRATION_PLAN.md) for detailed upgrade instructions
+- Configuration cleanup required: remove `[features.audio]` and `[UI.theme]` sections from `.chainlit/config.toml`
+- Update `[meta] generated_by` to "2.8.3"
+- Database backup recommended before upgrading
+
 ## v0.3.1 (2024-11-14)
 
 ### Feat
